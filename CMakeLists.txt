@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 project(damping-dolphin)
 
-set(QT_PATH "$ENV{HOME}/Qt5.12.12/5.12.12/gcc_64/lib/cmake" CACHE STRING "DEB OR RPM")
+set(QT_PATH "$ENV{HOME}/Qt5.12.12/5.12.12/gcc_64/lib/cmake" CACHE STRING "Path to Qt")
 set(CMAKE_PREFIX_PATH "${QT_PATH}")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -81,7 +81,7 @@ target_link_libraries(damping-dolphin
 
 if (WIN32)
     if (MSVC)
-        target_link_libraries(damping-dolphin openblas)
+        target_link_libraries(damping-dolphin openblas tbb tbbmalloc tbbmalloc_proxy)
     else ()
         target_link_libraries(damping-dolphin openblas)
     endif ()
