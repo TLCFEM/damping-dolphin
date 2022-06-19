@@ -1,0 +1,44 @@
+name: Dev
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+jobs:
+  ubuntu-dev:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+      - name: Compile
+        run: |
+          echo "DD_TIME=DD-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
+          sudo apt-get install -y fuse libfuse2
+          git submodule update --init --recursive
+          mkdir build && cd build
+          cmake -DCMAKE_BUILD_TYPE=release ../
+          make -j"$(nproc)"
+          wget -q https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+          chmod +x linuxdeployqt-continuous-x86_64.AppImage
+          mkdir deploy
+          cp damping-dolphin deploy
+          cd deploy
+          ../linuxdeployqt-continuous-x86_64.AppImage damping-dolphin -bundle-non-qt-libs -unsupported-allow-new-glibc -no-translations
+          tar -czf damping-dolphin-linux.tar.gz *
+          cp damping-dolphin-linux.tar.gz ../../
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: damping-dolphin.tar.gz
+          path: damping-dolphin.tar.gz
+      - name: Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: damping-dolphin-linux.tar.gz
+          asset_name: damping-dolphin-linux.tar.gz
+          tag: ${{ env.DD_TIME }}
+          prerelease: true
+          overwrite: true

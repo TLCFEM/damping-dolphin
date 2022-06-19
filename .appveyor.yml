@@ -1,0 +1,37 @@
+image: Visual Studio 2019
+platform: x64
+skip_tags: true
+init:
+  - ps: '$env:DD_TAG=''DD-''+(get-date -format "yyyyMMddHH")'
+build:
+  parallel: true
+  verbosity: minimal
+install:
+  - 'set QTDIR=C:\Qt\5.15.2\msvc2019_64'
+  - set PATH=%QTDIR%\bin;%PATH%
+  - cmd: >-
+      call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+build_script:
+  - qmake -config release damping-dolphin.pro
+  - nmake
+after_build:
+  - mkdir deploy
+  - cd deploy
+  - copy ..\release\damping-dolphin.exe damping-dolphin.exe
+  - copy ..\lib\win-gcc\lib*.dll .
+  - windeployqt damping-dolphin.exe
+  - 7z a damping-dolphin-win.zip *
+artifacts:
+  - path: deploy/damping-dolphin-win.zip
+    name: damping-dolphin-win
+for:
+  - branches:
+      only:
+        - master
+    deploy:
+      - provider: GitHub
+        tag: $(DD_TAG)
+        auth_token:
+          secure: G2VFcKQ6FM7lNKSVyevBHBwwHfvZAxSttITlXyOVYyxeEJycSI3BG+Tr6ZSpHwqX
+        artifact: damping-dolphin-win
+        force_update: true
