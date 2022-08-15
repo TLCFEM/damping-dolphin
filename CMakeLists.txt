@@ -11,20 +11,15 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS form)
 set(CMAKE_CXX_STANDARD 14)
 
 add_compile_definitions(ARMA_DONT_USE_ATLAS)
-if (UNIX)
-    add_compile_definitions(DD_TBB_ENABLED)
-endif ()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -Wno-implicit-fallthrough")
 
 if (UNIX)
     link_directories(lib/linux)
-elseif (WIN32)
-    if (MSVC)
-        link_directories(lib/win-msvc)
-    else ()
-        link_directories(lib/win-gcc)
-    endif ()
+elseif (MSVC)
+    link_directories(lib/win-msvc)
+else ()
+    link_directories(lib/win-gcc)
 endif ()
 
 include_directories(include)
@@ -64,27 +59,29 @@ set(RESOURCES
         res/res.qrc
         )
 
-set(TBB_TEST OFF CACHE BOOL "Override option" FORCE)
-set(TBB_DISABLE_HWLOC_AUTOMATIC_SEARCH OFF CACHE BOOL "Override option" FORCE)
-add_subdirectory(oneTBB)
+add_executable(${PROJECT_NAME} ${UIS} ${SOURCES} ${RESOURCES})
 
-include_directories(oneTBB/include)
-
-add_executable(damping-dolphin ${UIS} ${SOURCES} ${RESOURCES})
-
-target_link_libraries(damping-dolphin
+target_link_libraries(${PROJECT_NAME}
         Qt5::Core
         Qt5::Gui
         Qt5::Widgets
         Qt5::PrintSupport
+        openblas
         )
 
-if (WIN32)
-    if (MSVC)
-        target_link_libraries(damping-dolphin openblas tbb tbbmalloc tbbmalloc_proxy)
-    else ()
-        target_link_libraries(damping-dolphin openblas)
-    endif ()
-elseif (UNIX)
-    target_link_libraries(damping-dolphin openblas gfortran quadmath gomp tbb tbbmalloc tbbmalloc_proxy)
+if (UNIX)
+    target_link_libraries(damping-dolphin gfortran quadmath gomp pthread)
+endif ()
+
+if (UNIX)
+    add_compile_definitions(DD_TBB_ENABLED)
+    set(TBB_TEST OFF CACHE BOOL "Override option" FORCE)
+    set(TBB_DISABLE_HWLOC_AUTOMATIC_SEARCH OFF CACHE BOOL "Override option" FORCE)
+    add_subdirectory(oneTBB)
+
+    include_directories(oneTBB/include)
+
+    add_dependencies(${PROJECT_NAME} TBB::tbb TBB::tbbmalloc TBB::tbbmalloc_proxy)
+
+    target_link_libraries(${PROJECT_NAME} tbb tbbmalloc tbbmalloc_proxy)
 endif ()

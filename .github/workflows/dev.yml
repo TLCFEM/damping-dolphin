@@ -6,7 +6,7 @@ on:
     branches: [ dev ]
 jobs:
   ubuntu-dev:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Clone
         uses: actions/checkout@v2
@@ -17,6 +17,7 @@ jobs:
           echo "DD_TIME=DD-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
           sudo apt-get install -y fuse libfuse2
           git submodule update --init --recursive
+          cd oneTBB && git checkout v2021.5.0 && cd ..
           mkdir build && cd build
           cmake -DCMAKE_BUILD_TYPE=release ../
           make -j"$(nproc)"
@@ -31,8 +32,8 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
-          name: damping-dolphin.tar.gz
-          path: damping-dolphin.tar.gz
+          name: damping-dolphin-linux.tar.gz
+          path: damping-dolphin-linux.tar.gz
       - name: Release
         uses: svenstaro/upload-release-action@v2
         with:
