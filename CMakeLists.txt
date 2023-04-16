@@ -30,7 +30,17 @@ find_package(Qt5 COMPONENTS
         Gui
         Widgets
         PrintSupport
-        REQUIRED)
+        )
+find_package(Qt6 COMPONENTS
+        Core
+        Gui
+        Widgets
+        PrintSupport
+        )
+
+if (NOT Qt5_FOUND AND NOT Qt6_FOUND)
+    message(FATAL_ERROR "Qt not found")
+endif ()
 
 set(SOURCES
         src/FitSetting.cpp
@@ -61,13 +71,23 @@ set(RESOURCES
 
 add_executable(${PROJECT_NAME} ${UIS} ${SOURCES} ${RESOURCES})
 
-target_link_libraries(${PROJECT_NAME}
-        Qt5::Core
-        Qt5::Gui
-        Qt5::Widgets
-        Qt5::PrintSupport
-        openblas
-        )
+if (Qt6_FOUND)
+    target_link_libraries(${PROJECT_NAME}
+            Qt6::Core
+            Qt6::Gui
+            Qt6::Widgets
+            Qt6::PrintSupport
+            openblas
+            )
+else ()
+    target_link_libraries(${PROJECT_NAME}
+            Qt5::Core
+            Qt5::Gui
+            Qt5::Widgets
+            Qt5::PrintSupport
+            openblas
+            )
+endif ()
 
 if (UNIX)
     target_link_libraries(damping-dolphin gfortran quadmath gomp pthread)
