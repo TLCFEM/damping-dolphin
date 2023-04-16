@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 project(damping-dolphin)
 
+set(COMPILE_TBB OFF CACHE BOOL "Compile TBB")
 set(QT_PATH "$ENV{HOME}/Qt5.12.12/5.12.12/gcc_64/lib/cmake" CACHE STRING "Path to Qt")
 set(CMAKE_PREFIX_PATH "${QT_PATH}")
 set(CMAKE_AUTOMOC ON)
@@ -95,13 +96,16 @@ endif ()
 
 if (UNIX)
     add_compile_definitions(DD_TBB_ENABLED)
-    set(TBB_TEST OFF CACHE BOOL "Override option" FORCE)
-    set(TBB_DISABLE_HWLOC_AUTOMATIC_SEARCH OFF CACHE BOOL "Override option" FORCE)
-    add_subdirectory(oneTBB)
 
-    include_directories(oneTBB/include)
+    if (COMPILE_TBB)
+        set(TBB_TEST OFF CACHE BOOL "Override option" FORCE)
+        set(TBB_DISABLE_HWLOC_AUTOMATIC_SEARCH OFF CACHE BOOL "Override option" FORCE)
+        add_subdirectory(oneTBB)
 
-    add_dependencies(${PROJECT_NAME} TBB::tbb TBB::tbbmalloc TBB::tbbmalloc_proxy)
+        include_directories(oneTBB/include)
+
+        add_dependencies(${PROJECT_NAME} TBB::tbb TBB::tbbmalloc TBB::tbbmalloc_proxy)
+    endif ()
 
     target_link_libraries(${PROJECT_NAME} tbb tbbmalloc tbbmalloc_proxy)
 endif ()
