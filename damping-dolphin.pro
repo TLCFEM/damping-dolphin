@@ -6,7 +6,7 @@ CONFIG += c++14
 
 RC_ICONS = res/dolphin.ico
 
-unix: QMAKE_CXXFLAGS += -Wno-deprecated-copy
+unix: QMAKE_CXXFLAGS += -Wno-deprecated-copy -Wno-implicit-fallthrough -fopenmp
 
 unix:!macx: LIBS += -L$$PWD/lib/linux -lopenblas -lgfortran -lquadmath -lgomp
 
@@ -16,6 +16,10 @@ gcc:LIBS += -L$$PWD/lib/win-gcc -lopenblas -lgfortran -lquadmath
 }
 
 DEFINES += ARMA_DONT_USE_ATLAS
+
+win32{
+DEFINES += ARMA_USE_OPENMP
+}
 
 INCLUDEPATH += include \
     include/QCustomPlot \

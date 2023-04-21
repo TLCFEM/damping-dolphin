@@ -1,3 +1,20 @@
+/*******************************************************************************
+ * Copyright (C) 2022-2023 Theodore Chang
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+
 #include "FitSetting.h"
 #include <QIcon>
 #include <QInputDialog>
@@ -18,17 +35,6 @@ FitSetting::~FitSetting() {
 
 Ui::FitSetting* FitSetting::getUi() {
     return ui;
-}
-
-void FitSetting::on_changeBatchSize_clicked() {
-    bool flag;
-    const auto batchSize = QInputDialog::getText(this, "Batch Size", "Input batch size...").toInt(&flag);
-    if(!flag || batchSize < 0) {
-        QMessageBox::information(this, tr("Oops!"), tr("The batch size needs to be a positive integer."));
-        return;
-    }
-
-    ui->batchSize->setText(QString::number(batchSize));
 }
 
 void FitSetting::on_changeWeight_clicked() {

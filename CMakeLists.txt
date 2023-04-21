@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.22)
 
 project(damping-dolphin)
 
-set(QT_PATH "$ENV{HOME}/Qt5.12.12/5.12.12/gcc_64/lib/cmake" CACHE STRING "DEB OR RPM")
+set(COMPILE_TBB OFF CACHE BOOL "Compile TBB")
+set(QT_PATH "$ENV{HOME}/Qt5.12.12/5.12.12/gcc_64/lib/cmake" CACHE STRING "Path to Qt")
 set(CMAKE_PREFIX_PATH "${QT_PATH}")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -11,20 +12,18 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS form)
 set(CMAKE_CXX_STANDARD 14)
 
 add_compile_definitions(ARMA_DONT_USE_ATLAS)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -Wno-implicit-fallthrough")
 if (UNIX)
-    add_compile_definitions(DD_TBB_ENABLED)
+    add_compile_definitions(ARMA_USE_OPENMP)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 endif ()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
 
 if (UNIX)
     link_directories(lib/linux)
-elseif (WIN32)
-    if (MSVC)
-        link_directories(lib/win-msvc)
-    else ()
-        link_directories(lib/win-gcc)
-    endif ()
+elseif (MSVC)
+    link_directories(lib/win-msvc)
+else ()
+    link_directories(lib/win-gcc)
 endif ()
 
 include_directories(include)
@@ -35,7 +34,17 @@ find_package(Qt5 COMPONENTS
         Gui
         Widgets
         PrintSupport
-        REQUIRED)
+        )
+find_package(Qt6 COMPONENTS
+        Core
+        Gui
+        Widgets
+        PrintSupport
+        )
+
+if (NOT Qt5_FOUND AND NOT Qt6_FOUND)
+    message(FATAL_ERROR "Qt not found")
+endif ()
 
 set(SOURCES
         src/FitSetting.cpp
@@ -64,27 +73,42 @@ set(RESOURCES
         res/res.qrc
         )
 
-set(TBB_TEST OFF CACHE BOOL "Override option" FORCE)
-set(TBB_DISABLE_HWLOC_AUTOMATIC_SEARCH OFF CACHE BOOL "Override option" FORCE)
-add_subdirectory(oneTBB)
+add_executable(${PROJECT_NAME} ${UIS} ${SOURCES} ${RESOURCES})
 
-include_directories(oneTBB/include)
+if (Qt6_FOUND)
+    target_link_libraries(${PROJECT_NAME}
+            Qt6::Core
+            Qt6::Gui
+            Qt6::Widgets
+            Qt6::PrintSupport
+            openblas
+            )
+else ()
+    target_link_libraries(${PROJECT_NAME}
+            Qt5::Core
+            Qt5::Gui
+            Qt5::Widgets
+            Qt5::PrintSupport
+            openblas
+            )
+endif ()
 
-add_executable(damping-dolphin ${UIS} ${SOURCES} ${RESOURCES})
+if (UNIX)
+    target_link_libraries(damping-dolphin gfortran quadmath gomp pthread)
+endif ()
 
-target_link_libraries(damping-dolphin
-        Qt5::Core
-        Qt5::Gui
-        Qt5::Widgets
-        Qt5::PrintSupport
-        )
+if (UNIX)
+    add_compile_definitions(DD_TBB_ENABLED)
 
-if (WIN32)
-    if (MSVC)
-        target_link_libraries(damping-dolphin openblas)
-    else ()
-        target_link_libraries(damping-dolphin openblas)
+    if (COMPILE_TBB)
+        set(TBB_TEST OFF CACHE BOOL "Override option" FORCE)
+        set(TBB_DISABLE_HWLOC_AUTOMATIC_SEARCH OFF CACHE BOOL "Override option" FORCE)
+        add_subdirectory(oneTBB)
+
+        include_directories(oneTBB/include)
+
+        add_dependencies(${PROJECT_NAME} TBB::tbb TBB::tbbmalloc TBB::tbbmalloc_proxy)
     endif ()
-elseif (UNIX)
-    target_link_libraries(damping-dolphin openblas gfortran quadmath gomp tbb tbbmalloc tbbmalloc_proxy)
+
+    target_link_libraries(${PROJECT_NAME} tbb tbbmalloc tbbmalloc_proxy)
 endif ()

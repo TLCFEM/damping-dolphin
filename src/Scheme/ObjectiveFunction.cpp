@@ -1,3 +1,20 @@
+/*******************************************************************************
+ * Copyright (C) 2022-2023 Theodore Chang
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+
 #include "ObjectiveFunction.h"
 
 vec ObjectiveFunction::s(const vec& p) const { return p; }
@@ -19,17 +36,11 @@ void ObjectiveFunction::initializeSampling(mat&& T) {
     base = linspace<uvec>(0, num_modes - 1, num_modes);
 }
 
-void ObjectiveFunction::setWeight(const double W) {
-    weight = W;
-}
+void ObjectiveFunction::setWeight(const double W) { weight = W; }
 
-void ObjectiveFunction::setMaxOrder(const int M) {
-    max_order = M;
-}
+void ObjectiveFunction::setMaxOrder(const int M) { max_order = M; }
 
-unsigned ObjectiveFunction::getNumberModes() const {
-    return num_modes;
-}
+unsigned ObjectiveFunction::getNumberModes() const { return num_modes; }
 
 double ObjectiveFunction::Evaluate(const mat& x) {
     mat g;
@@ -43,25 +54,4 @@ size_t ObjectiveFunction::NumConstraints() const { return 0; }
 
 double ObjectiveFunction::EvaluateConstraint(const size_t, const arma::mat&) { return 0.; }
 
-void ObjectiveFunction::GradientConstraint(const size_t, const arma::mat& x, arma::mat& g) {
-    g.zeros(size(x));
-}
-
-void ObjectiveFunction::Shuffle() {
-    const uvec ordering = randperm(sampling.n_cols);
-
-    sampling = sampling.cols(ordering);
-    response = response.cols(ordering);
-}
-
-size_t ObjectiveFunction::NumFunctions() const { return sampling.n_cols; }
-
-double ObjectiveFunction::Evaluate(const mat& x, const size_t i, const size_t batchSize) {
-    mat g;
-
-    return EvaluateWithGradient(x, i, g, batchSize);
-}
-
-void ObjectiveFunction::Gradient(const mat& x, const size_t i, mat& g, const size_t batchSize) {
-    EvaluateWithGradient(x, i, g, batchSize);
-}
+void ObjectiveFunction::GradientConstraint(const size_t, const arma::mat& x, arma::mat& g) { g.zeros(size(x)); }

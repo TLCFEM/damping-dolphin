@@ -22,7 +22,7 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="2" column="1">
+        <item row="1" column="1">
          <widget class="QLineEdit" name="stepSize">
           <property name="text">
            <string>1E-3</string>
@@ -32,41 +32,14 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="2">
-         <widget class="QPushButton" name="changeStepSize">
+        <item row="4" column="2">
+         <widget class="QPushButton" name="changeMaxIter">
           <property name="text">
            <string>Change</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="weightLabel">
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Types 1, 2 and 4 involve order parameters that shall be integer. It is introduced into the cost function via the penalty method. The weight is the size of penalty, a value of smaller than E-3 often results in decent results.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="text">
-           <string>Order Weight</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="batchSizeLabel">
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Some optimizers perform optimization on batches, larger batch size may lead to better results.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="text">
-           <string>Batch Size</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="maxOrderLabel">
-          <property name="text">
-           <string>Max Order</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
+        <item row="2" column="1">
          <widget class="QLineEdit" name="tolerance">
           <property name="text">
            <string>1E-3</string>
@@ -76,14 +49,73 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="1">
+        <item row="3" column="2">
+         <widget class="QPushButton" name="changeMaxOrder">
+          <property name="text">
+           <string>Change</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QPushButton" name="changeWeight">
+          <property name="text">
+           <string>Change</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="maxIterLabel">
+          <property name="text">
+           <string>Max Iteration</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QPushButton" name="changeTolerance">
+          <property name="text">
+           <string>Change</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
          <widget class="QLineEdit" name="maxOrder">
           <property name="text">
            <string>5</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="maxIter">
+          <property name="text">
+           <string>20000</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="weightLabel">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Types 1, 2 and 4 involve order parameters that shall be integer. It is introduced into the cost function via the penalty method. The weight is the size of penalty, a value of smaller than E-3 often results in decent results.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>Order Weight</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QPushButton" name="changeStepSize">
+          <property name="text">
+           <string>Change</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="maxOrderLabel">
+          <property name="text">
+           <string>Max Order</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
          <widget class="QLineEdit" name="weight">
           <property name="text">
            <string>1E-4</string>
@@ -93,76 +125,17 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="2">
-         <widget class="QPushButton" name="changeTolerance">
-          <property name="text">
-           <string>Change</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="2">
-         <widget class="QPushButton" name="changeMaxOrder">
-          <property name="text">
-           <string>Change</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="toleranceLabel">
-          <property name="text">
-           <string>Tolerance</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QPushButton" name="changeWeight">
-          <property name="text">
-           <string>Change</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
+        <item row="1" column="0">
          <widget class="QLabel" name="stepSizeLabel">
           <property name="text">
            <string>Step Size</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="batchSize">
+        <item row="2" column="0">
+         <widget class="QLabel" name="toleranceLabel">
           <property name="text">
-           <string>32</string>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QPushButton" name="changeBatchSize">
-          <property name="text">
-           <string>Change</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QLineEdit" name="maxIter">
-          <property name="text">
-           <string>20000</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0">
-         <widget class="QLabel" name="maxIterLabel">
-          <property name="text">
-           <string>Max Iteration</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="2">
-         <widget class="QPushButton" name="changeMaxIter">
-          <property name="text">
-           <string>Change</string>
+           <string>Tolerance</string>
           </property>
          </widget>
         </item>

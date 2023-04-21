@@ -607,91 +607,6 @@
                      <string>AugLagrangian</string>
                     </property>
                    </item>
-                   <item>
-                    <property name="text">
-                     <string>AdaBound</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>AdaDelta</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>AdaGrad</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Adam</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>AdaMax</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>FTML</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>KatyushaProximal</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>NadaMax</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>NesterovMomentumSGD</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>RMSProp</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>SARAH</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>StandardSGD</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>SWATS</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Simulated Annealing</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Conventional Neural Evolution</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Differential Evolution</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>SPSA</string>
-                    </property>
-                   </item>
                   </widget>
                  </item>
                 </layout>
@@ -1253,7 +1168,7 @@
      <x>0</x>
      <y>0</y>
      <width>1050</width>
-     <height>24</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
