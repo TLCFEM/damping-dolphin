@@ -17,6 +17,10 @@ gcc:LIBS += -L$$PWD/lib/win-gcc -lopenblas -lgfortran -lquadmath
 
 DEFINES += ARMA_DONT_USE_ATLAS
 
+win32{
+DEFINES += ARMA_USE_OPENMP
+}
+
 INCLUDEPATH += include \
     include/QCustomPlot \
     src

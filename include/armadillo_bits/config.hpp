@@ -117,7 +117,7 @@
 //// ARMA_BLAS_LONG, ARMA_BLAS_LONG_LONG, ARMA_USE_FORTRAN_HIDDEN_ARGS
 
 #if !defined(ARMA_USE_OPENMP)
-#define ARMA_USE_OPENMP
+// #define ARMA_USE_OPENMP
 //// Uncomment the above line to forcefully enable use of OpenMP for parallelisation.
 //// Note that ARMA_USE_OPENMP is automatically enabled when a compiler supporting OpenMP 3.1 is detected.
 #endif

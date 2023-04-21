@@ -12,8 +12,11 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS form)
 set(CMAKE_CXX_STANDARD 14)
 
 add_compile_definitions(ARMA_DONT_USE_ATLAS)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -Wno-implicit-fallthrough -fopenmp")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -Wno-implicit-fallthrough")
+if (UNIX)
+    add_compile_definitions(ARMA_USE_OPENMP)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+endif ()
 
 if (UNIX)
     link_directories(lib/linux)
