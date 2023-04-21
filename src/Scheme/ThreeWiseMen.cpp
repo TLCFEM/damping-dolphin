@@ -102,30 +102,6 @@ double ThreeWiseMen::EvaluateWithGradient(const mat& x, mat& g) {
     return accu(pow(fi, 2.));
 }
 
-double ThreeWiseMen::EvaluateWithGradient(const mat& x, const size_t i, mat& g, const size_t batchSize) {
-    mat dg(num_para * num_modes, batchSize, fill::none);
-
-    for(auto J = 0u; J < num_modes; ++J) {
-        const vec p(&x(num_para * J), num_para);
-        const auto sp = s(p);
-        const auto dsp = ds(p);
-        dd::parallel_for(size_t(0), batchSize, [&](const size_t I) {
-            const auto grad = compute_gradient(sampling(0, I + i), sp);
-            response(J, I + i) = grad(0);
-            vec gi(&dg(num_para * J, I), num_para, false, true);
-            gi = grad.tail(num_para) % dsp;
-        });
-    }
-
-    rowvec fi = sum(response.cols(i, i + batchSize - 1), 0) - sampling.row(1).cols(i, i + batchSize - 1);
-
-    dd::parallel_for(size_t(0), batchSize, [&](const size_t I) { dg.col(I) *= 2. * fi(I); });
-
-    g = sum(dg, 1);
-
-    return accu(pow(fi, 2.));
-}
-
 QStringList ThreeWiseMen::getTypeList(const mat& result) const {
     QStringList list;
 

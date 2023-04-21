@@ -496,15 +496,13 @@ void MainWindow::performFittingTask(const mat& reference) {
 
     opt_setting.stepSize = fit_dialog.getUi()->stepSize->text().toDouble();
     opt_setting.tolerance = fit_dialog.getUi()->tolerance->text().toDouble();
-    opt_setting.batchSize = fit_dialog.getUi()->batchSize->text().toInt();
     opt_setting.weight = fit_dialog.getUi()->weight->text().toDouble();
     opt_setting.maxIter = fit_dialog.getUi()->maxIter->text().toInt();
 
     mat result, samples;
 
-    if(reference.n_rows == 1) {
+    if(reference.n_rows == 1)
         samples = reference;
-    }
     else {
         samples.set_size(number_samples, 2);
         samples.col(0) = logspace(lower, upper, number_samples);
@@ -525,40 +523,6 @@ void MainWindow::performFittingTask(const mat& reference) {
         result = run_optimizer<GradientDescent>(opt_setting, f.get(), &early_quit);
     else if(ui->optimizerList->currentText() == "AugLagrangian")
         result = run_optimizer<AugLagrangian>(opt_setting, f.get(), &early_quit);
-    else if(ui->optimizerList->currentText() == "AdaBound")
-        result = run_optimizer<AdaBound>(opt_setting, f.get(), &early_quit);
-    else if(ui->optimizerList->currentText() == "AdaDelta")
-        result = run_optimizer<AdaDelta>(opt_setting, f.get(), &early_quit);
-    else if(ui->optimizerList->currentText() == "AdaGrad")
-        result = run_optimizer<AdaGrad>(opt_setting, f.get(), &early_quit);
-    else if(ui->optimizerList->currentText() == "Adam")
-        result = run_optimizer<Adam>(opt_setting, f.get(), &early_quit);
-    else if(ui->optimizerList->currentText() == "AdaMax")
-        result = run_optimizer<AdaMax>(opt_setting, f.get(), &early_quit);
-    else if(ui->optimizerList->currentText() == "FTML")
-        result = run_optimizer<FTML>(opt_setting, f.get(), &early_quit);
-    else if(ui->optimizerList->currentText() == "KatyushaProximal")
-        result = run_optimizer<KatyushaProximal>(opt_setting, f.get(), &early_quit);
-    else if(ui->optimizerList->currentText() == "NadaMax")
-        result = run_optimizer<NadaMax>(opt_setting, f.get(), &early_quit);
-    else if(ui->optimizerList->currentText() == "NesterovMomentumSGD")
-        result = run_optimizer<NesterovMomentumSGD>(opt_setting, f.get(), &early_quit);
-    else if(ui->optimizerList->currentText() == "RMSProp")
-        result = run_optimizer<RMSProp>(opt_setting, f.get(), &early_quit);
-    else if(ui->optimizerList->currentText() == "SARAH")
-        result = run_optimizer<SARAH>(opt_setting, f.get(), &early_quit);
-    else if(ui->optimizerList->currentText() == "StandardSGD")
-        result = run_optimizer<StandardSGD>(opt_setting, f.get(), &early_quit);
-    else if(ui->optimizerList->currentText() == "SWATS")
-        result = run_optimizer<SWATS>(opt_setting, f.get(), &early_quit);
-    else if(ui->optimizerList->currentText() == "Simulated Annealing")
-        result = run_optimizer<SA<>>(opt_setting, f.get(), &early_quit);
-    else if(ui->optimizerList->currentText() == "Conventional Neural Evolution")
-        result = run_optimizer<CNE>(opt_setting, f.get(), &early_quit);
-    else if(ui->optimizerList->currentText() == "Differential Evolution")
-        result = run_optimizer<DE>(opt_setting, f.get(), &early_quit);
-    else if(ui->optimizerList->currentText() == "SPSA")
-        result = run_optimizer<SPSA>(opt_setting, f.get(), &early_quit);
 
     result.print("result");
 

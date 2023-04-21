@@ -50,8 +50,6 @@ public:
     [[nodiscard]] unsigned getNumberModes() const;
 
     [[nodiscard]] virtual size_t NumConstraints() const;
-    [[nodiscard]] virtual size_t NumFunctions() const;
-    virtual void Shuffle();
 
     virtual double Evaluate(const mat&);
     virtual void Gradient(const mat&, mat&);
@@ -59,11 +57,7 @@ public:
     virtual double EvaluateConstraint(size_t, const mat&);
     virtual void GradientConstraint(size_t, const mat&, mat&);
 
-    virtual double Evaluate(const mat&, size_t, size_t);
-    virtual void Gradient(const mat&, size_t, mat&, size_t);
-
     virtual double EvaluateWithGradient(const mat&, mat&) = 0;
-    virtual double EvaluateWithGradient(const mat&, size_t, mat&, size_t) = 0;
 
     [[nodiscard]] virtual QStringList getTypeList(const mat&) const = 0;
 };

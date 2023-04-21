@@ -37,7 +37,6 @@ public:
     [[nodiscard]] unsigned getSize() const override;
 
     double EvaluateWithGradient(const mat&, mat&) override;
-    double EvaluateWithGradient(const mat&, size_t, mat&, size_t) override;
 
     [[nodiscard]] virtual size_t NumConstraints() const override;
 

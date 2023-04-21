@@ -34,14 +34,9 @@ public:
     Ui::FitSetting* getUi();
 
 private slots:
-    void on_changeBatchSize_clicked();
-
     void on_changeWeight_clicked();
-
     void on_changeStepSize_clicked();
-
     void on_changeTolerance_clicked();
-
     void on_changeMaxOrder_clicked();
     void on_changeMaxIter_clicked();
 

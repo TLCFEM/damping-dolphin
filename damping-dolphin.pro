@@ -6,7 +6,7 @@ CONFIG += c++14
 
 RC_ICONS = res/dolphin.ico
 
-unix: QMAKE_CXXFLAGS += -Wno-deprecated-copy -Wno-implicit-fallthrough
+unix: QMAKE_CXXFLAGS += -Wno-deprecated-copy -Wno-implicit-fallthrough -fopenmp
 
 unix:!macx: LIBS += -L$$PWD/lib/linux -lopenblas -lgfortran -lquadmath -lgomp
 

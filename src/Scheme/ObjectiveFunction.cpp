@@ -36,17 +36,11 @@ void ObjectiveFunction::initializeSampling(mat&& T) {
     base = linspace<uvec>(0, num_modes - 1, num_modes);
 }
 
-void ObjectiveFunction::setWeight(const double W) {
-    weight = W;
-}
+void ObjectiveFunction::setWeight(const double W) { weight = W; }
 
-void ObjectiveFunction::setMaxOrder(const int M) {
-    max_order = M;
-}
+void ObjectiveFunction::setMaxOrder(const int M) { max_order = M; }
 
-unsigned ObjectiveFunction::getNumberModes() const {
-    return num_modes;
-}
+unsigned ObjectiveFunction::getNumberModes() const { return num_modes; }
 
 double ObjectiveFunction::Evaluate(const mat& x) {
     mat g;
@@ -60,25 +54,4 @@ size_t ObjectiveFunction::NumConstraints() const { return 0; }
 
 double ObjectiveFunction::EvaluateConstraint(const size_t, const arma::mat&) { return 0.; }
 
-void ObjectiveFunction::GradientConstraint(const size_t, const arma::mat& x, arma::mat& g) {
-    g.zeros(size(x));
-}
-
-void ObjectiveFunction::Shuffle() {
-    const uvec ordering = randperm(sampling.n_cols);
-
-    sampling = sampling.cols(ordering);
-    response = response.cols(ordering);
-}
-
-size_t ObjectiveFunction::NumFunctions() const { return sampling.n_cols; }
-
-double ObjectiveFunction::Evaluate(const mat& x, const size_t i, const size_t batchSize) {
-    mat g;
-
-    return EvaluateWithGradient(x, i, g, batchSize);
-}
-
-void ObjectiveFunction::Gradient(const mat& x, const size_t i, mat& g, const size_t batchSize) {
-    EvaluateWithGradient(x, i, g, batchSize);
-}
+void ObjectiveFunction::GradientConstraint(const size_t, const arma::mat& x, arma::mat& g) { g.zeros(size(x)); }

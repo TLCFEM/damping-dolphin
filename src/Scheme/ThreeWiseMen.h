@@ -35,7 +35,6 @@ public:
     [[nodiscard]] unsigned getSize() const override;
 
     double EvaluateWithGradient(const mat&, mat&) override;
-    double EvaluateWithGradient(const mat&, size_t, mat&, size_t) override;
 
     [[nodiscard]] QStringList getTypeList(const mat&) const override;
 };

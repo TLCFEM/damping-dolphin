@@ -103,9 +103,7 @@ vec TwoCities::ds(const vec& p) const {
     return dsp;
 }
 
-unsigned TwoCities::getSize() const {
-    return num_para;
-}
+unsigned TwoCities::getSize() const { return num_para; }
 
 double TwoCities::EvaluateWithGradient(const mat& x, mat& g) {
     mat dg(num_para * num_modes, sampling.n_cols, fill::none);
@@ -140,42 +138,7 @@ double TwoCities::EvaluateWithGradient(const mat& x, mat& g) {
     return accu(pow(fi, 2.)) + weight * accu(pow(floor_diff, 2.));
 }
 
-double TwoCities::EvaluateWithGradient(const mat& x, const size_t i, mat& g, const size_t batchSize) {
-    mat dg(num_para * num_modes, batchSize, fill::none);
-    mat n(2, num_modes, fill::none);
-    mat dn(2, num_modes, fill::none);
-
-    for(auto J = 0u; J < num_modes; ++J) {
-        const vec p(&x(num_para * J), num_para);
-        const auto sp = s(p);
-        const auto dsp = ds(p);
-        n.col(J) = sp.tail(2);
-        dn.col(J) = dsp.tail(2);
-        dd::parallel_for(size_t(0), batchSize, [&](const size_t I) {
-            const auto grad = compute_gradient(sampling(0, I + i), sp);
-            response(J, I + i) = grad(0);
-            vec gi(&dg(num_para * J, I), num_para, false, true);
-            gi = grad.tail(num_para) % dsp;
-        });
-    }
-
-    const rowvec fi = sum(response.cols(i, i + batchSize - 1), 0) - sampling.row(1).cols(i, i + batchSize - 1);
-
-    dd::parallel_for(size_t(0), batchSize, [&](const size_t I) { dg.col(I) *= 2. * fi(I); });
-
-    g = sum(dg, 1);
-
-    const mat floor_diff = decimal(n).t();
-
-    g(num_para * base + 2) += 2. * weight * floor_diff.col(0) % dn.row(0).t();
-    g(num_para * base + 3) += 2. * weight * floor_diff.col(1) % dn.row(1).t();
-
-    return accu(pow(fi, 2.)) + weight * accu(pow(floor_diff, 2.));
-}
-
-size_t TwoCities::NumConstraints() const {
-    return 2 * num_modes;
-}
+size_t TwoCities::NumConstraints() const { return 2 * num_modes; }
 
 double TwoCities::EvaluateConstraint(const size_t i, const mat& x) {
     const vec p(&x(num_para * (i / 2)), num_para);

@@ -37,17 +37,6 @@ Ui::FitSetting* FitSetting::getUi() {
     return ui;
 }
 
-void FitSetting::on_changeBatchSize_clicked() {
-    bool flag;
-    const auto batchSize = QInputDialog::getText(this, "Batch Size", "Input batch size...").toInt(&flag);
-    if(!flag || batchSize < 0) {
-        QMessageBox::information(this, tr("Oops!"), tr("The batch size needs to be a positive integer."));
-        return;
-    }
-
-    ui->batchSize->setText(QString::number(batchSize));
-}
-
 void FitSetting::on_changeWeight_clicked() {
     bool flag;
     const auto weight = QInputDialog::getText(this, "Weight", "Input weight...").toDouble(&flag);

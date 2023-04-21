@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_compile_definitions(ARMA_DONT_USE_ATLAS)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -Wno-implicit-fallthrough")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -Wno-implicit-fallthrough -fopenmp")
 
 if (UNIX)
     link_directories(lib/linux)
