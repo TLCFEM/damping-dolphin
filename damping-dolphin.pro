@@ -24,9 +24,12 @@ DEFINES += ARMA_USE_OPENMP
 }
 
 exists(tbb){
-message("tbb found")
-msvc:LIBS += -L$$PWD/tbb/lib -ltbb
-msvc:DEFINES += DD_TBB_ENABLED
+message("Enable tbb.")
+msvc{
+LIBS += -L$$PWD/tbb/lib -ltbb
+DEFINES += DD_TBB_ENABLED
+INCLUDEPATH += $$PWD/tbb/include
+}
 }
 
 INCLUDEPATH += include \
