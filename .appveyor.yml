@@ -25,6 +25,7 @@ after_build:
   - cd deploy
   - copy ..\release\damping-dolphin.exe damping-dolphin.exe
   - copy ..\lib\win-gcc\lib*.dll .
+  - copy ..\tbb\bin\tbb*.dll .
   - windeployqt damping-dolphin.exe
   - 7z a damping-dolphin-win.zip *
 artifacts:
