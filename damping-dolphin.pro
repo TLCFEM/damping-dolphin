@@ -12,13 +12,24 @@ unix:!macx: LIBS += -L$$PWD/lib/linux -lopenblas -lgfortran -lquadmath -lgomp
 
 win32{
 msvc:LIBS += -L$$PWD/lib/win-msvc -llibopenblas
-gcc:LIBS += -L$$PWD/lib/win-gcc -lopenblas -lgfortran -lquadmath
+gcc:LIBS += -L$$PWD/lib/win-gcc -lopenblas -lgfortran -lquadmath -lgomp
+msvc:QMAKE_CXXFLAGS += /openmp:experimental
+gcc: QMAKE_CXXFLAGS += -fopenmp
 }
 
 DEFINES += ARMA_DONT_USE_ATLAS
 
 win32{
 DEFINES += ARMA_USE_OPENMP
+}
+
+exists(tbb){
+message("Enable tbb.")
+msvc{
+LIBS += -L$$PWD/tbb/lib -ltbb
+DEFINES += DD_TBB_ENABLED
+INCLUDEPATH += $$PWD/tbb/include
+}
 }
 
 INCLUDEPATH += include \
