@@ -14,6 +14,10 @@ install:
 build_script:
   - git submodule update --init --recursive
   - cd oneTBB && git checkout v2021.5.0 && cd ..
+  - mkdir tbb-build && cd tbb-build
+  - cmake -DCMAKE_BUILD_TYPE=Release -DTBB_TEST=OFF -DCMAKE_INSTALL_PREFIX=../tbb ../oneTBB
+  - cmake --build . --target INSTALL --config Release --parallel 4
+  - cd ..
   - qmake -config release damping-dolphin.pro
   - nmake
 after_build:
