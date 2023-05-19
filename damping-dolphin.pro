@@ -25,11 +25,9 @@ DEFINES += ARMA_USE_OPENMP
 
 exists(tbb){
 message("Enable tbb.")
-msvc{
 LIBS += -L$$PWD/tbb/lib -ltbb
 DEFINES += DD_TBB_ENABLED
 INCLUDEPATH += $$PWD/tbb/include
-}
 }
 
 INCLUDEPATH += include \
