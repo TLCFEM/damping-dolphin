@@ -26,7 +26,7 @@ jobs:
           mkdir deploy
           cp damping-dolphin deploy
           cd deploy
-          ../linuxdeployqt-continuous-x86_64.AppImage damping-dolphin -appimage -unsupported-allow-new-glibc -no-translations
+          ../linuxdeployqt-continuous-x86_64.AppImage damping-dolphin -bundle-non-qt-libs -unsupported-allow-new-glibc -no-translations
           ls -alt
           tar -czf damping-dolphin-linux.tar.gz *
           cp damping-dolphin-linux.tar.gz ../../
