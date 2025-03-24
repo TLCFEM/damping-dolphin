@@ -4,14 +4,16 @@ on:
     branches: [ dev ]
   pull_request:
     branches: [ dev ]
+env:
+  DD_TIME: ""
 jobs:
   ubuntu-dev:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Install Qt
-        uses: jurplel/install-qt-action@v2
+        uses: jurplel/install-qt-action@v4
       - name: Compile
         run: |
           echo "DD_TIME=DD-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
@@ -30,7 +32,7 @@ jobs:
           tar -czf damping-dolphin-linux.tar.gz *
           cp damping-dolphin-linux.tar.gz ../../
       - name: Upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: damping-dolphin-linux.tar.gz
           path: damping-dolphin-linux.tar.gz
