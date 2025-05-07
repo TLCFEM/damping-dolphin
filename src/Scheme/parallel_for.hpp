@@ -19,7 +19,13 @@
 #define DAMPING_DOLPHIN_PARALLEL_FOR_HPP
 
 #ifdef DD_TBB_ENABLED
+#ifdef emit
+#undef emit
 #include <tbb/parallel_for.h>
+#define emit
+#else
+#include <tbb/parallel_for.h>
+#endif
 #endif
 
 namespace dd {

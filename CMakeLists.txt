@@ -31,13 +31,13 @@ endif ()
 include_directories(include)
 include_directories(include/QCustomPlot)
 
-find_package(Qt5 COMPONENTS
+find_package(Qt5 QUIET COMPONENTS
         Core
         Gui
         Widgets
         PrintSupport
 )
-find_package(Qt6 COMPONENTS
+find_package(Qt6 QUIET COMPONENTS
         Core
         Gui
         Widgets
