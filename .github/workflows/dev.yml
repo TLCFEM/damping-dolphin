@@ -8,7 +8,7 @@ env:
   DD_TIME: ""
 jobs:
   ubuntu-dev:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -21,7 +21,7 @@ jobs:
           echo "DD_TIME=DD-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
           sudo apt-get install -y libfuse2
           mkdir build && cd build
-          cmake -DCMAKE_BUILD_TYPE=release -DCOMPILE_TBB=ON ../
+          cmake -DCMAKE_BUILD_TYPE=release -DCOMPILE_TBB=OFF ../
           make -j"$(nproc)"
           wget -q https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
           chmod +x linuxdeployqt-continuous-x86_64.AppImage
@@ -29,6 +29,7 @@ jobs:
           cp damping-dolphin deploy
           cd deploy
           ../linuxdeployqt-continuous-x86_64.AppImage damping-dolphin -bundle-non-qt-libs -unsupported-allow-new-glibc -no-translations
+          ls -alt
           tar -czf damping-dolphin-linux.tar.gz *
           cp damping-dolphin-linux.tar.gz ../../
       - name: Upload
