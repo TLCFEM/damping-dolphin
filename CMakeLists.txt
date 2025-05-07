@@ -4,7 +4,7 @@ project(damping-dolphin)
 
 set(COMPILE_TBB OFF CACHE BOOL "Compile TBB")
 if (NOT QT_PATH)
-    set(QT_PATH "$ENV{HOME}/Qt5.12.12/5.12.12/gcc_64/lib/cmake" CACHE STRING "Path to Qt")
+    set(QT_PATH "$ENV{HOME}/Qt/6.9.0/gcc_64/lib/cmake" CACHE STRING "Path to Qt")
 endif ()
 set(CMAKE_PREFIX_PATH "${QT_PATH}")
 set(CMAKE_AUTOMOC ON)
@@ -31,22 +31,12 @@ endif ()
 include_directories(include)
 include_directories(include/QCustomPlot)
 
-find_package(Qt5 QUIET COMPONENTS
+find_package(Qt6 REQUIRED COMPONENTS
         Core
         Gui
         Widgets
         PrintSupport
 )
-find_package(Qt6 QUIET COMPONENTS
-        Core
-        Gui
-        Widgets
-        PrintSupport
-)
-
-if (NOT Qt5_FOUND AND NOT Qt6_FOUND)
-    message(FATAL_ERROR "Qt not found")
-endif ()
 
 set(SOURCES
         src/FitSetting.cpp
@@ -77,23 +67,13 @@ set(RESOURCES
 
 add_executable(${PROJECT_NAME} ${UIS} ${SOURCES} ${RESOURCES})
 
-if (Qt6_FOUND)
-    target_link_libraries(${PROJECT_NAME}
-            Qt6::Core
-            Qt6::Gui
-            Qt6::Widgets
-            Qt6::PrintSupport
-            openblas
-    )
-else ()
-    target_link_libraries(${PROJECT_NAME}
-            Qt5::Core
-            Qt5::Gui
-            Qt5::Widgets
-            Qt5::PrintSupport
-            openblas
-    )
-endif ()
+target_link_libraries(${PROJECT_NAME}
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Widgets
+        Qt6::PrintSupport
+        openblas
+)
 
 if (UNIX)
     target_link_libraries(${PROJECT_NAME} gfortran quadmath gomp pthread)

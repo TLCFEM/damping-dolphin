@@ -7,13 +7,12 @@ build:
   parallel: true
   verbosity: minimal
 install:
-  - 'set QTDIR=C:\Qt\5.15.2\msvc2019_64'
+  - 'set QTDIR=C:\Qt\6.5.3\msvc2019_64'
   - set PATH=%QTDIR%\bin;%PATH%
   - cmd: >-
       call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
 build_script:
   - git submodule update --init --recursive
-  - cd oneTBB && git checkout v2022.1.0 && cd ..
   - mkdir tbb-build && cd tbb-build
   - cmake -DCMAKE_BUILD_TYPE=Release -DTBB_TEST=OFF -DCMAKE_INSTALL_PREFIX=../tbb ../oneTBB
   - cmake --build . --target INSTALL --config Release --parallel 4
