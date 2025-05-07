@@ -98,9 +98,9 @@ endif ()
 if (UNIX)
     target_link_libraries(${PROJECT_NAME} gfortran quadmath gomp pthread)
 
-    add_compile_definitions(DD_TBB_ENABLED)
-
     if (COMPILE_TBB)
+        add_compile_definitions(DD_TBB_ENABLED)
+
         set(TBB_TEST OFF CACHE BOOL "Override option" FORCE)
         set(TBB_DISABLE_HWLOC_AUTOMATIC_SEARCH OFF CACHE BOOL "Override option" FORCE)
         add_subdirectory(oneTBB)
