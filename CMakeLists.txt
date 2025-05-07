@@ -107,8 +107,6 @@ if (UNIX)
 
         include_directories(oneTBB/include)
 
-        add_dependencies(${PROJECT_NAME} TBB::tbb TBB::tbbmalloc TBB::tbbmalloc_proxy)
+        target_link_libraries(${PROJECT_NAME} TBB::tbb TBB::tbbmalloc TBB::tbbmalloc_proxy)
     endif ()
-
-    target_link_libraries(${PROJECT_NAME} tbb tbbmalloc tbbmalloc_proxy)
 endif ()
