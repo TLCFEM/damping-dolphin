@@ -48,12 +48,16 @@ class op_inv_spd_full
   
   template<typename eT>
   arma_cold inline static bool apply_tiny_2x2(Mat<eT>& X);
-  
-  template<typename eT>
-  arma_cold inline static bool apply_tiny_3x3(Mat<eT>& X);
-  
-  template<typename eT>
-  arma_cold inline static bool apply_tiny_4x4(Mat<eT>& X);
+  };
+
+
+
+template<typename T>
+struct op_inv_spd_state
+  {
+  uword size    = uword(0);
+  T     rcond   = T(0);
+  bool  is_diag = false;
   };
 
 
@@ -64,7 +68,7 @@ class op_inv_spd_rcond
   public:
   
   template<typename T1>
-  inline static bool apply_direct(Mat<typename T1::elem_type>& out_inv, typename T1::pod_type& out_rcond, const Base<typename T1::elem_type,T1>& expr);
+  inline static bool apply_direct(Mat<typename T1::elem_type>& out_inv, op_inv_spd_state<typename T1::pod_type>& out_state, const Base<typename T1::elem_type,T1>& expr);
   };
 
 
