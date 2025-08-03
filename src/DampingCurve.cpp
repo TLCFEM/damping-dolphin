@@ -83,7 +83,7 @@ void DampingCurve::updateLogarithmicDampingCurve(double start, double end, const
 double DampingCurve::query(const double in_omega) {
     double out_zeta = 0.;
 
-    for(const auto& I : qAsConst(damping_modes))
+    for(const auto& I : std::as_const(damping_modes))
         out_zeta += I->operator()(in_omega);
 
     return out_zeta;
@@ -102,7 +102,7 @@ const QVector<double>& DampingCurve::getDampingRatioVector(const int tag) {
 QStringList DampingCurve::getTypeInfo() {
     QStringList type_list;
 
-    for(const auto& I : qAsConst(damping_modes))
+    for(const auto& I : std::as_const(damping_modes))
         type_list.append(I->str());
 
     return type_list;
@@ -111,7 +111,7 @@ QStringList DampingCurve::getTypeInfo() {
 QStringList DampingCurve::getCommand() {
     QStringList command_list;
 
-    for(const auto& I : qAsConst(damping_modes))
+    for(const auto& I : std::as_const(damping_modes))
         command_list.append(I->command());
 
     return command_list;
@@ -132,7 +132,7 @@ double DampingCurve::maxFrequency() {
 double DampingCurve::minDampingRatio() {
     auto min_zeta = 0.;
 
-    for(const auto& I : qAsConst(zeta))
+    for(const auto& I : std::as_const(zeta))
         min_zeta = std::min(min_zeta, *std::min_element(I.cbegin(), I.cend()));
 
     min_zeta = std::min(min_zeta, *std::min_element(zeta_sum.cbegin(), zeta_sum.cend()));
@@ -143,7 +143,7 @@ double DampingCurve::minDampingRatio() {
 double DampingCurve::maxDampingRatio() {
     auto max_zeta = 0.;
 
-    for(const auto& I : qAsConst(zeta))
+    for(const auto& I : std::as_const(zeta))
         max_zeta = std::max(max_zeta, *std::max_element(I.cbegin(), I.cend()));
 
     max_zeta = std::max(max_zeta, *std::max_element(zeta_sum.cbegin(), zeta_sum.cend()));
