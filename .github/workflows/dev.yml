@@ -33,7 +33,7 @@ jobs:
           tar -czf damping-dolphin-linux.tar.gz *
           cp damping-dolphin-linux.tar.gz ../../
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: damping-dolphin-linux.tar.gz
           path: damping-dolphin-linux.tar.gz
