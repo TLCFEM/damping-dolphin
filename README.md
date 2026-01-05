@@ -5,7 +5,7 @@
 🐬 Damping Dolphin is a utility to visualise and generate parameter sets for use in the damping model.
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5775922.svg)](https://doi.org/10.5281/zenodo.5775922)
-[![Build status](https://ci.appveyor.com/api/projects/status/bynuruxojcbejeax/branch/main?svg=true)](https://ci.appveyor.com/project/TLCFEM/damping-dolphin/branch/main)
+[![Build status](https://ci.appveyor.com/api/projects/status/bynuruxojcbejeax/branch/master?svg=true)](https://ci.appveyor.com/project/TLCFEM/damping-dolphin/branch/master)
 [![license](https://img.shields.io/github/license/TLCFEM/suanPan.svg?color=44cc11)](https://www.gnu.org/licenses/gpl-3.0)
 
 It is able to generate desired model parameters that fit the target damping response on the frequency domain.
