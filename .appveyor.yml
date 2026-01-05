@@ -7,10 +7,10 @@ build:
   parallel: true
   verbosity: minimal
 install:
-  - 'set QTDIR=C:\Qt\6.9.3\msvc2019_64'
+  - 'set QTDIR=C:\Qt\6.9.3\msvc2022_64'
   - set PATH=%QTDIR%\bin;%PATH%
   - cmd: >-
-      call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+      call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
 build_script:
   - git submodule update --init --recursive
   - mkdir tbb-build && cd tbb-build
