@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.22)
 
 project(damping-dolphin)
 
-set(COMPILE_TBB OFF CACHE BOOL "Compile TBB")
+set(DD_USE_TBB OFF CACHE BOOL "Compile TBB")
 if (NOT QT_PATH)
-    set(QT_PATH "$ENV{HOME}/Qt/6.9.0/gcc_64/lib/cmake" CACHE STRING "Path to Qt")
+    set(QT_PATH "$ENV{HOME}/Qt/6.10.1/gcc_64/lib/cmake" CACHE STRING "Path to Qt")
 endif ()
 set(CMAKE_PREFIX_PATH "${QT_PATH}")
 set(CMAKE_AUTOMOC ON)
@@ -78,7 +78,7 @@ target_link_libraries(${PROJECT_NAME}
 if (UNIX)
     target_link_libraries(${PROJECT_NAME} gfortran quadmath gomp pthread)
 
-    if (COMPILE_TBB)
+    if (DD_USE_TBB)
         add_compile_definitions(DD_TBB_ENABLED)
 
         set(TBB_TEST OFF CACHE BOOL "Override option" FORCE)
