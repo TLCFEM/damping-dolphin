@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -77,6 +77,38 @@ spglue_times::apply(SpMat<typename T1::elem_type>& out, const SpGlue<SpOp<T1,spo
     
     out.steal_mem(tmp);
     }
+  
+  out *= X.A.aux;
+  }
+
+
+
+template<typename T1, typename T2>
+inline
+void
+spglue_times::apply(SpMat_noalias<typename T1::elem_type>& out, const SpGlue<T1,T2,spglue_times>& X)
+  {
+  arma_debug_sigprint();
+  
+  const unwrap_spmat<T1> UA(X.A);
+  const unwrap_spmat<T2> UB(X.B);
+  
+  spglue_times::apply_noalias(out, UA.M, UB.M);
+  }
+
+
+
+template<typename T1, typename T2>
+inline
+void
+spglue_times::apply(SpMat_noalias<typename T1::elem_type>& out, const SpGlue<SpOp<T1,spop_scalar_times>,T2,spglue_times>& X)
+  {
+  arma_debug_sigprint();
+  
+  const unwrap_spmat<T1> UA(X.A.m);
+  const unwrap_spmat<T2> UB(X.B);
+  
+  spglue_times::apply_noalias(out, UA.M, UB.M);
   
   out *= X.A.aux;
   }

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,6 +43,26 @@ class distr_param
     , a_int   (0)
     , b_int   (0)
     , a_double(0)
+    , b_double(0)
+    {
+    }
+  
+  
+  inline explicit distr_param(const int a)
+    : state   (1)
+    , a_int   (a)
+    , b_int   (0)
+    , a_double(double(a))
+    , b_double(double(0))
+    {
+    }
+  
+  
+  inline explicit distr_param(const double a)
+    : state   (2)
+    , a_int   (int(a))
+    , b_int   (int(0))
+    , a_double(a)
     , b_double(0)
     {
     }

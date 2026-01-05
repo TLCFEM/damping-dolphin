@@ -41,12 +41,12 @@ template<
     typename UpdateRuleType>
 template<typename FunctionType, typename MatType, typename GradType,
          typename... CallbackTypes>
-typename std::enable_if<IsArmaType<GradType>::value,
-typename MatType::elem_type>::type
+typename std::enable_if<IsMatrixType<GradType>::value,
+    typename MatType::elem_type>::type
 FrankWolfe<LinearConstrSolverType, UpdateRuleType>::Optimize(
-  FunctionType& function,
-  MatType& iterateIn,
-  CallbackTypes&&... callbacks)
+    FunctionType& function,
+    MatType& iterateIn,
+    CallbackTypes&&... callbacks)
 {
   // Convenience typedefs.
   typedef typename MatType::elem_type ElemType;
@@ -75,8 +75,11 @@ FrankWolfe<LinearConstrSolverType, UpdateRuleType>::Optimize(
   // Controls early termination of the optimization process.
   bool terminate = false;
 
+  const size_t actualMaxIterations = (maxIterations == 0) ?
+      std::numeric_limits<size_t>::max() : maxIterations;
+
   Callback::BeginOptimization(*this, f, iterate, callbacks...);
-  for (size_t i = 1; i != maxIterations && !terminate; ++i)
+  for (size_t i = 0; i < actualMaxIterations && !terminate; ++i)
   {
     currentObjective = f.EvaluateWithGradient(iterate, gradient);
 
@@ -95,7 +98,7 @@ FrankWolfe<LinearConstrSolverType, UpdateRuleType>::Optimize(
     if (gap < tolerance)
     {
       Info << "FrankWolfe::Optimize(): minimized within tolerance "
-          << tolerance << "; " << "terminating optimization." << std::endl;
+          << tolerance << "; terminating optimization." << std::endl;
 
       Callback::EndOptimization(*this, f, iterate, callbacks...);
       return currentObjective;
@@ -109,8 +112,11 @@ FrankWolfe<LinearConstrSolverType, UpdateRuleType>::Optimize(
     terminate |= Callback::StepTaken(*this, f, iterate, callbacks...);
   }
 
-  Info << "FrankWolfe::Optimize(): maximum iterations (" << maxIterations
-      << ") reached; " << "terminating optimization." << std::endl;
+  if (!terminate)
+  {
+    Info << "FrankWolfe::Optimize(): maximum iterations (" << maxIterations
+        << ") reached; terminating optimization." << std::endl;
+  }
 
   Callback::EndOptimization(*this, f, iterate, callbacks...);
   return currentObjective;

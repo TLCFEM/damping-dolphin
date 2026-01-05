@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -117,6 +117,31 @@ op_trimat::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_trimat>& in)
       {
       op_trimat::apply_proxy_noalias(out, P, upper);
       }
+    }
+  }
+
+
+
+template<typename T1>
+inline
+void
+op_trimat::apply(Mat_noalias<typename T1::elem_type>& out, const Op<T1,op_trimat>& in)
+  {
+  arma_debug_sigprint();
+  
+  const bool upper = (in.aux_uword_a == 0);
+  
+  if( (is_Mat<T1>::value) || (is_Mat<typename Proxy<T1>::stored_type>::value) || (arma_config::openmp && Proxy<T1>::use_mp) )
+    {
+    const quasi_unwrap<T1> U(in.m);
+    
+    op_trimat::apply_mat_noalias(out, U.M, upper);
+    }
+  else
+    {
+    const Proxy<T1> P(in.m);
+    
+    op_trimat::apply_proxy_noalias(out, P, upper);
     }
   }
 

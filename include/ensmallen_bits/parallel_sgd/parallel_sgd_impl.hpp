@@ -95,11 +95,14 @@ typename MatType::elem_type>::type ParallelSGD<DecayPolicyType>::Optimize(
   arma::Col<size_t> visitationOrder = arma::linspace<arma::Col<size_t>>(0,
       (function.NumFunctions() - 1), function.NumFunctions());
 
+  const size_t actualMaxIterations = (maxIterations == 0) ?
+      std::numeric_limits<size_t>::max() : maxIterations;
+
   // Iterate till the objective is within tolerance or the maximum number of
   // allowed iterations is reached. If maxIterations is 0, this will iterate
   // till convergence.
   Callback::BeginOptimization(*this, function, iterate, callbacks...);
-  for (size_t i = 1; i != maxIterations && !terminate; ++i)
+  for (size_t i = 0; i < actualMaxIterations && !terminate; ++i)
   {
     // Calculate the overall objective.
     lastObjective = overallObjective;
@@ -132,7 +135,7 @@ typename MatType::elem_type>::type ParallelSGD<DecayPolicyType>::Optimize(
       return overallObjective;
     }
 
-    // Get the stepsize for this iteration
+    // Get the stepsize for this iteration.
     double stepSize = decayPolicy.StepSize(i);
 
     // Shuffle for uniform sampling of functions by each thread.
@@ -180,7 +183,9 @@ typename MatType::elem_type>::type ParallelSGD<DecayPolicyType>::Optimize(
 
             // Call out to utility function to use the right type of OpenMP
             // lock.
-            UpdateLocation(iterate, row, i, stepSize * value);
+            // TODO: if batch size support > 1 is added, `stepSize` will need to
+            // be updated here.
+            UpdateLocation(iterate, row, i, ElemType(stepSize) * value);
           }
         }
         terminate |= Callback::StepTaken(*this, function, iterate,

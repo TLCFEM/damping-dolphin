@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,7 +23,7 @@
 
 template<typename T1, typename T2>
 arma_warn_unused
-arma_inline
+inline
 const Glue<T1,T2,glue_kron>
 kron(const Base<typename T1::elem_type,T1>& A, const Base<typename T1::elem_type,T2>& B)
   {
@@ -90,7 +90,7 @@ kron(const Base<T,T1>& X, const Base<std::complex<T>,T2>& Y)
 
 template<typename T1, typename T2>
 arma_warn_unused
-arma_inline
+inline
 const SpGlue<T1, T2, spglue_kron>
 kron(const SpBase<typename T1::elem_type,T1>& A, const SpBase<typename T1::elem_type,T2>& B)
   {

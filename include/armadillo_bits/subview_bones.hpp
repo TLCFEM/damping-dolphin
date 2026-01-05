@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -85,7 +85,7 @@ class subview : public Base< eT, subview<eT> >
   template<typename T1> inline void operator-= (const SpBase<eT,T1>& x);
   template<typename T1> inline void operator%= (const SpBase<eT,T1>& x);
   template<typename T1> inline void operator/= (const SpBase<eT,T1>& x);
-
+  
   template<typename T1, typename gen_type>
   inline typename enable_if2< is_same_type<typename T1::elem_type, eT>::value, void>::result operator=(const Gen<T1,gen_type>& x);
   
@@ -171,8 +171,8 @@ class subview : public Base< eT, subview<eT> >
   inline       subview<eT> rows(const uword in_row1, const uword in_row2);
   inline const subview<eT> rows(const uword in_row1, const uword in_row2) const;
   
-  inline       subview<eT> cols(const uword in_col1, const uword in_col2);
-  inline const subview<eT> cols(const uword in_col1, const uword in_col2) const;
+  inline       subview<eT> cols(const uword in_col1, const uword in_col2);        // deliberately not returning subview_cols
+  inline const subview<eT> cols(const uword in_col1, const uword in_col2) const;  // deliberately not returning subview_cols
   
   inline       subview<eT> submat(const uword in_row1, const uword in_col1, const uword in_row2, const uword in_col2);
   inline const subview<eT> submat(const uword in_row1, const uword in_col1, const uword in_row2, const uword in_col2) const;
@@ -396,6 +396,11 @@ class subview_col : public subview<eT>
   inline void zeros();
   inline void ones();
   
+  arma_warn_unused inline bool is_finite() const;
+  
+  arma_warn_unused inline bool has_inf() const;
+  arma_warn_unused inline bool has_nan() const;
+  
   arma_inline eT  at_alt    (const uword i) const;
   
   arma_inline eT& operator[](const uword i);
@@ -431,8 +436,8 @@ class subview_col : public subview<eT>
   arma_warn_unused inline eT min() const;
   arma_warn_unused inline eT max() const;
   
-  arma_frown("use .index_min() instead") inline eT min(uword& index_of_min_val) const;
-  arma_frown("use .index_max() instead") inline eT max(uword& index_of_max_val) const;
+  [[deprecated("use .index_min() instead")]] inline eT min(uword& index_of_min_val) const;
+  [[deprecated("use .index_max() instead")]] inline eT max(uword& index_of_max_val) const;
   
   arma_warn_unused inline uword index_min() const;
   arma_warn_unused inline uword index_max() const;
@@ -528,6 +533,8 @@ class subview_row : public subview<eT>
   static constexpr bool is_col  = false;
   static constexpr bool is_xvec = false;
   
+  const eT* rowmem;
+  
   inline void operator= (const subview<eT>& x);
   inline void operator= (const subview_row& x);
   inline void operator= (const eT val);
@@ -544,6 +551,15 @@ class subview_row : public subview<eT>
   arma_warn_unused arma_inline const Op<subview_row<eT>,op_strans> st() const;
   
   arma_warn_unused arma_inline const Op<subview_row<eT>,op_strans> as_col() const;
+  
+  inline void fill(const eT val);
+  inline void zeros();
+  inline void ones();
+  
+  arma_warn_unused inline bool is_finite() const;
+  
+  arma_warn_unused inline bool has_inf() const;
+  arma_warn_unused inline bool has_nan() const;
   
   inline eT  at_alt    (const uword i) const;
   

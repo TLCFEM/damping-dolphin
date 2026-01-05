@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -80,7 +80,7 @@ op_vectorise_col::apply_direct(Mat<typename T1::elem_type>& out, const T1& expr)
       }
     }
   else
-  if((is_Mat<typename Proxy<T1>::stored_type>::value) || (arma_config::openmp && Proxy<T1>::use_mp))
+  if( (quasi_unwrap<T1>::has_orig_mem) || (is_Mat<typename Proxy<T1>::stored_type>::value) || (arma_config::openmp && Proxy<T1>::use_mp) )
     {
     const quasi_unwrap<T1> U(expr);
     
@@ -113,6 +113,52 @@ op_vectorise_col::apply_direct(Mat<typename T1::elem_type>& out, const T1& expr)
       {
       op_vectorise_col::apply_proxy(out, P);
       }
+    }
+  }
+
+
+
+template<typename T1>
+inline
+void
+op_vectorise_col::apply(Mat_noalias<typename T1::elem_type>& out, const Op<T1,op_vectorise_col>& in)
+  {
+  arma_debug_sigprint();
+  
+  op_vectorise_col::apply_direct(out, in.m);
+  }
+
+
+
+template<typename T1>
+inline
+void
+op_vectorise_col::apply_direct(Mat_noalias<typename T1::elem_type>& out, const T1& expr)
+  {
+  arma_debug_sigprint();
+  
+  typedef typename T1::elem_type eT;
+  
+  if(is_subview<T1>::value)
+    {
+    const subview<eT>& sv = reinterpret_cast< const subview<eT>& >(expr);
+    
+    op_vectorise_col::apply_subview(out, sv);
+    }
+  else
+  if( (quasi_unwrap<T1>::has_orig_mem) || (is_Mat<typename Proxy<T1>::stored_type>::value) || (arma_config::openmp && Proxy<T1>::use_mp) )
+    {
+    const quasi_unwrap<T1> U(expr);
+    
+    out.set_size(U.M.n_elem, 1);
+    
+    arrayops::copy(out.memptr(), U.M.memptr(), U.M.n_elem);
+    }
+  else
+    {
+    const Proxy<T1> P(expr);
+    
+    op_vectorise_col::apply_proxy(out, P);
     }
   }
 
@@ -365,14 +411,30 @@ op_vectorise_cube_col::apply_subview(Mat<eT>& out, const subview_cube<eT>& sv)
   
   out.set_size(sv.n_elem, 1);
   
+  if(sv.n_elem == 0)  { return; }
+  
   eT* out_mem = out.memptr();
   
-  for(uword s=0; s < sv_ns; ++s)
-  for(uword c=0; c < sv_nc; ++c)
+  if( (sv_nr == 1) && (sv_nc == 1) && (sv.aux_slice1 == 0) )
     {
-    arrayops::copy(out_mem, sv.slice_colptr(s,c), sv_nr);
+    const uword sv_m_n_elem_slice = sv.m.n_elem_slice;
     
-    out_mem += sv_nr;
+    const eT* sv_m_ptr = &( sv.m.at(sv.aux_row1, sv.aux_col1, 0) );
+    
+    for(uword s=0; s < sv_ns; ++s)
+      {
+      out_mem[s] = (*sv_m_ptr);  sv_m_ptr += sv_m_n_elem_slice;
+      }
+    }
+  else
+    {
+    for(uword s=0; s < sv_ns; ++s)
+    for(uword c=0; c < sv_nc; ++c)
+      {
+      arrayops::copy(out_mem, sv.slice_colptr(s,c), sv_nr);
+      
+      out_mem += sv_nr;
+      }
     }
   }
 

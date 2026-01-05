@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -137,6 +137,24 @@ spop_trimat::apply(SpMat<typename T1::elem_type>& out, const SpOp<T1,spop_trimat
     {
     spop_trimat::apply_noalias(out, P, upper);
     }
+  }
+
+
+
+template<typename T1>
+inline
+void
+spop_trimat::apply(SpMat_noalias<typename T1::elem_type>& out, const SpOp<T1,spop_trimat>& in)
+  {
+  arma_debug_sigprint();
+  
+  const SpProxy<T1> P(in.m);
+  
+  arma_conform_check( (P.get_n_rows() != P.get_n_cols()), "trimatu()/trimatl(): given matrix must be square sized" );
+  
+  const bool upper = (in.aux_uword_a == 0);
+  
+  spop_trimat::apply_noalias(out, P, upper);
   }
 
 

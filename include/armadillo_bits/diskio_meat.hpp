@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,7 +22,7 @@
 
 //! Generate the first line of the header used for saving matrices in text format.
 //! Format: "ARMA_MAT_TXT_ABXYZ".
-//! A is one of: I (for integral types) or F (for floating point types).
+//! A is one of: I (for integral types) or F (for floating point types)
 //! B is one of: U (for unsigned types), S (for signed types), N (for not applicable) or C (for complex types).
 //! XYZ specifies the width of each element in terms of bytes, eg. "008" indicates eight bytes.
 template<typename eT>
@@ -40,8 +40,10 @@ diskio::gen_txt_header(const Mat<eT>&)
   const char* ARMA_MAT_TXT_IS004 = "ARMA_MAT_TXT_IS004";
   const char* ARMA_MAT_TXT_IU008 = "ARMA_MAT_TXT_IU008";
   const char* ARMA_MAT_TXT_IS008 = "ARMA_MAT_TXT_IS008";
+  const char* ARMA_MAT_TXT_FN002 = "ARMA_MAT_TXT_FN002";
   const char* ARMA_MAT_TXT_FN004 = "ARMA_MAT_TXT_FN004";
   const char* ARMA_MAT_TXT_FN008 = "ARMA_MAT_TXT_FN008";
+  const char* ARMA_MAT_TXT_FC004 = "ARMA_MAT_TXT_FC004";
   const char* ARMA_MAT_TXT_FC008 = "ARMA_MAT_TXT_FC008";
   const char* ARMA_MAT_TXT_FC016 = "ARMA_MAT_TXT_FC016";
   
@@ -59,8 +61,10 @@ diskio::gen_txt_header(const Mat<eT>&)
   else if(is_slng_t_32<eT>::value)  { header = const_cast<char*>(ARMA_MAT_TXT_IS004); }
   else if(is_ulng_t_64<eT>::value)  { header = const_cast<char*>(ARMA_MAT_TXT_IU008); }
   else if(is_slng_t_64<eT>::value)  { header = const_cast<char*>(ARMA_MAT_TXT_IS008); }
+  else if(     is_fp16<eT>::value)  { header = const_cast<char*>(ARMA_MAT_TXT_FN002); }
   else if(    is_float<eT>::value)  { header = const_cast<char*>(ARMA_MAT_TXT_FN004); }
   else if(   is_double<eT>::value)  { header = const_cast<char*>(ARMA_MAT_TXT_FN008); }
+  else if(  is_cx_fp16<eT>::value)  { header = const_cast<char*>(ARMA_MAT_TXT_FC004); }
   else if( is_cx_float<eT>::value)  { header = const_cast<char*>(ARMA_MAT_TXT_FC008); }
   else if(is_cx_double<eT>::value)  { header = const_cast<char*>(ARMA_MAT_TXT_FC016); }
   
@@ -89,8 +93,10 @@ diskio::gen_bin_header(const Mat<eT>&)
   const char* ARMA_MAT_BIN_IS004 = "ARMA_MAT_BIN_IS004";
   const char* ARMA_MAT_BIN_IU008 = "ARMA_MAT_BIN_IU008";
   const char* ARMA_MAT_BIN_IS008 = "ARMA_MAT_BIN_IS008";
+  const char* ARMA_MAT_BIN_FN002 = "ARMA_MAT_BIN_FN002";
   const char* ARMA_MAT_BIN_FN004 = "ARMA_MAT_BIN_FN004";
   const char* ARMA_MAT_BIN_FN008 = "ARMA_MAT_BIN_FN008";
+  const char* ARMA_MAT_BIN_FC004 = "ARMA_MAT_BIN_FC004";
   const char* ARMA_MAT_BIN_FC008 = "ARMA_MAT_BIN_FC008";
   const char* ARMA_MAT_BIN_FC016 = "ARMA_MAT_BIN_FC016";  
   
@@ -108,8 +114,10 @@ diskio::gen_bin_header(const Mat<eT>&)
   else if(is_slng_t_32<eT>::value)  { header = const_cast<char*>(ARMA_MAT_BIN_IS004); }
   else if(is_ulng_t_64<eT>::value)  { header = const_cast<char*>(ARMA_MAT_BIN_IU008); }
   else if(is_slng_t_64<eT>::value)  { header = const_cast<char*>(ARMA_MAT_BIN_IS008); }
+  else if(     is_fp16<eT>::value)  { header = const_cast<char*>(ARMA_MAT_BIN_FN002); }
   else if(    is_float<eT>::value)  { header = const_cast<char*>(ARMA_MAT_BIN_FN004); }
   else if(   is_double<eT>::value)  { header = const_cast<char*>(ARMA_MAT_BIN_FN008); }
+  else if(  is_cx_fp16<eT>::value)  { header = const_cast<char*>(ARMA_MAT_BIN_FC004); }
   else if( is_cx_float<eT>::value)  { header = const_cast<char*>(ARMA_MAT_BIN_FC008); }
   else if(is_cx_double<eT>::value)  { header = const_cast<char*>(ARMA_MAT_BIN_FC016); }
   
@@ -138,10 +146,12 @@ diskio::gen_bin_header(const SpMat<eT>&)
   const char* ARMA_SPM_BIN_IS004 = "ARMA_SPM_BIN_IS004";
   const char* ARMA_SPM_BIN_IU008 = "ARMA_SPM_BIN_IU008";
   const char* ARMA_SPM_BIN_IS008 = "ARMA_SPM_BIN_IS008";
+  const char* ARMA_SPM_BIN_FN002 = "ARMA_SPM_BIN_FN002";
   const char* ARMA_SPM_BIN_FN004 = "ARMA_SPM_BIN_FN004";
   const char* ARMA_SPM_BIN_FN008 = "ARMA_SPM_BIN_FN008";
+  const char* ARMA_SPM_BIN_FC004 = "ARMA_SPM_BIN_FC004";
   const char* ARMA_SPM_BIN_FC008 = "ARMA_SPM_BIN_FC008";
-  const char* ARMA_SPM_BIN_FC016 = "ARMA_SPM_BIN_FC016";  
+  const char* ARMA_SPM_BIN_FC016 = "ARMA_SPM_BIN_FC016";
   
   char* header = nullptr;
   
@@ -157,8 +167,10 @@ diskio::gen_bin_header(const SpMat<eT>&)
   else if(is_slng_t_32<eT>::value)  { header = const_cast<char*>(ARMA_SPM_BIN_IS004); }
   else if(is_ulng_t_64<eT>::value)  { header = const_cast<char*>(ARMA_SPM_BIN_IU008); }
   else if(is_slng_t_64<eT>::value)  { header = const_cast<char*>(ARMA_SPM_BIN_IS008); }
+  else if(     is_fp16<eT>::value)  { header = const_cast<char*>(ARMA_SPM_BIN_FN002); }
   else if(    is_float<eT>::value)  { header = const_cast<char*>(ARMA_SPM_BIN_FN004); }
   else if(   is_double<eT>::value)  { header = const_cast<char*>(ARMA_SPM_BIN_FN008); }
+  else if(  is_cx_fp16<eT>::value)  { header = const_cast<char*>(ARMA_SPM_BIN_FC004); }
   else if( is_cx_float<eT>::value)  { header = const_cast<char*>(ARMA_SPM_BIN_FC008); }
   else if(is_cx_double<eT>::value)  { header = const_cast<char*>(ARMA_SPM_BIN_FC016); }
   
@@ -186,8 +198,10 @@ diskio::gen_txt_header(const Cube<eT>&)
   const char* ARMA_CUB_TXT_IS004 = "ARMA_CUB_TXT_IS004";
   const char* ARMA_CUB_TXT_IU008 = "ARMA_CUB_TXT_IU008";
   const char* ARMA_CUB_TXT_IS008 = "ARMA_CUB_TXT_IS008";
+  const char* ARMA_CUB_TXT_FN002 = "ARMA_CUB_TXT_FN002";
   const char* ARMA_CUB_TXT_FN004 = "ARMA_CUB_TXT_FN004";
   const char* ARMA_CUB_TXT_FN008 = "ARMA_CUB_TXT_FN008";
+  const char* ARMA_CUB_TXT_FC004 = "ARMA_CUB_TXT_FC004";
   const char* ARMA_CUB_TXT_FC008 = "ARMA_CUB_TXT_FC008";
   const char* ARMA_CUB_TXT_FC016 = "ARMA_CUB_TXT_FC016";
   
@@ -205,8 +219,10 @@ diskio::gen_txt_header(const Cube<eT>&)
   else if(is_slng_t_32<eT>::value)  { header = const_cast<char*>(ARMA_CUB_TXT_IS004); }
   else if(is_ulng_t_64<eT>::value)  { header = const_cast<char*>(ARMA_CUB_TXT_IU008); }
   else if(is_slng_t_64<eT>::value)  { header = const_cast<char*>(ARMA_CUB_TXT_IS008); }
+  else if(     is_fp16<eT>::value)  { header = const_cast<char*>(ARMA_CUB_TXT_FN002); }
   else if(    is_float<eT>::value)  { header = const_cast<char*>(ARMA_CUB_TXT_FN004); }
   else if(   is_double<eT>::value)  { header = const_cast<char*>(ARMA_CUB_TXT_FN008); }
+  else if(  is_cx_fp16<eT>::value)  { header = const_cast<char*>(ARMA_CUB_TXT_FC004); }
   else if( is_cx_float<eT>::value)  { header = const_cast<char*>(ARMA_CUB_TXT_FC008); }
   else if(is_cx_double<eT>::value)  { header = const_cast<char*>(ARMA_CUB_TXT_FC016); }
   
@@ -235,8 +251,10 @@ diskio::gen_bin_header(const Cube<eT>&)
   const char* ARMA_CUB_BIN_IS004 = "ARMA_CUB_BIN_IS004";
   const char* ARMA_CUB_BIN_IU008 = "ARMA_CUB_BIN_IU008";
   const char* ARMA_CUB_BIN_IS008 = "ARMA_CUB_BIN_IS008";
+  const char* ARMA_CUB_BIN_FN002 = "ARMA_CUB_BIN_FN002";
   const char* ARMA_CUB_BIN_FN004 = "ARMA_CUB_BIN_FN004";
   const char* ARMA_CUB_BIN_FN008 = "ARMA_CUB_BIN_FN008";
+  const char* ARMA_CUB_BIN_FC004 = "ARMA_CUB_BIN_FC004";
   const char* ARMA_CUB_BIN_FC008 = "ARMA_CUB_BIN_FC008";
   const char* ARMA_CUB_BIN_FC016 = "ARMA_CUB_BIN_FC016";
   
@@ -254,8 +272,10 @@ diskio::gen_bin_header(const Cube<eT>&)
   else if(is_slng_t_32<eT>::value)  { header = const_cast<char*>(ARMA_CUB_BIN_IS004); }
   else if(is_ulng_t_64<eT>::value)  { header = const_cast<char*>(ARMA_CUB_BIN_IU008); }
   else if(is_slng_t_64<eT>::value)  { header = const_cast<char*>(ARMA_CUB_BIN_IS008); }
+  else if(     is_fp16<eT>::value)  { header = const_cast<char*>(ARMA_CUB_BIN_FN002); }
   else if(    is_float<eT>::value)  { header = const_cast<char*>(ARMA_CUB_BIN_FN004); }
   else if(   is_double<eT>::value)  { header = const_cast<char*>(ARMA_CUB_BIN_FN008); }
+  else if(  is_cx_fp16<eT>::value)  { header = const_cast<char*>(ARMA_CUB_BIN_FC004); }
   else if( is_cx_float<eT>::value)  { header = const_cast<char*>(ARMA_CUB_BIN_FC008); }
   else if(is_cx_double<eT>::value)  { header = const_cast<char*>(ARMA_CUB_BIN_FC016); }
   
@@ -655,7 +675,7 @@ diskio::prepare_stream(std::ostream& f)
     
     // NOTE: for 'float' the optimum settings are f.precision(8) and cell_width = 15
     // NOTE: however, to avoid introducing errors in case single precision data is loaded as double precision,
-    // NOTE: the same settings must be used for both 'float' and 'double'
+    // NOTE: the same settings must be used for both 'float' and 'double' (and other floating-point types)
     }
   else
   if(is_cx<eT>::value)
@@ -668,7 +688,32 @@ diskio::prepare_stream(std::ostream& f)
   
   return cell_width;
   }
+
+
+
+template<typename eT>
+inline
+constexpr
+eT
+diskio::real_as_int_lower_limit()
+  {
+  constexpr eT eT_int_accuracy_lower_limit = -( (is_fp16<eT>::value) ? eT(0x800) : ( (is_float<eT>::value) ? eT(0x1000000) : eT(0x20000000000000) ) );
   
+  return (std::max)( eT(std::numeric_limits<int>::lowest()), eT_int_accuracy_lower_limit );
+  }
+
+
+
+template<typename eT>
+inline
+constexpr
+eT
+diskio::real_as_int_upper_limit()
+  {
+  constexpr eT eT_int_accuracy_upper_limit = (is_fp16<eT>::value) ? eT(0x800) : ( (is_float<eT>::value) ? eT(0x1000000) : eT(0x20000000000000) );
+  
+  return (std::min)( eT(std::numeric_limits<int>::max()), eT_int_accuracy_upper_limit );
+  }
 
 
 
@@ -915,8 +960,8 @@ diskio::save_csv_ascii(const Mat<eT>& x, std::ostream& f, const char separator)
   uword x_n_rows = x.n_rows;
   uword x_n_cols = x.n_cols;
   
-  const eT eT_int_lowest = eT(std::numeric_limits<int>::lowest());
-  const eT eT_int_max    = eT(std::numeric_limits<int>::max());
+  constexpr eT eT_int_lower = diskio::real_as_int_lower_limit<eT>();
+  constexpr eT eT_int_upper = diskio::real_as_int_upper_limit<eT>();
   
   for(uword row=0; row < x_n_rows; ++row)
     {
@@ -924,7 +969,7 @@ diskio::save_csv_ascii(const Mat<eT>& x, std::ostream& f, const char separator)
       {
       const eT val = x.at(row,col);
       
-      const bool is_real_int = (is_real<eT>::yes) && arma_isfinite(val) && (val > eT_int_lowest) && (val < eT_int_max) && (eT(int(val)) == val);
+      const bool is_real_int = (is_real<eT>::yes) && arma_isfinite(val) && (val > eT_int_lower) && (val < eT_int_upper) && (eT(int(val)) == val);
       
       (is_real_int) ? arma_ostream::raw_print_elem(f, int(val)) : arma_ostream::raw_print_elem(f, val);
       
@@ -957,8 +1002,8 @@ diskio::save_csv_ascii(const Mat< std::complex<T> >& x, std::ostream& f, const c
   
   diskio::prepare_stream<eT>(f);
   
-  const T T_int_lowest = T(std::numeric_limits<int>::lowest());
-  const T T_int_max    = T(std::numeric_limits<int>::max());
+  constexpr T T_int_lower = diskio::real_as_int_lower_limit<T>();
+  constexpr T T_int_upper = diskio::real_as_int_upper_limit<T>();
   
   uword x_n_rows = x.n_rows;
   uword x_n_cols = x.n_cols;
@@ -974,8 +1019,8 @@ diskio::save_csv_ascii(const Mat< std::complex<T> >& x, std::ostream& f, const c
       const T    abs_i = (val_i < T(0)) ? T(-val_i) : T(val_i);
       const char sgn_i = (val_i < T(0)) ? char('-') : char('+');
       
-      const bool val_r_is_real_int = (is_real<T>::yes) && arma_isfinite(val_r) && (val_r > T_int_lowest) && (val_r < T_int_max) && (T(int(val_r)) == val_r);
-      const bool abs_i_is_real_int = (is_real<T>::yes) && arma_isfinite(abs_i)                           && (abs_i < T_int_max) && (T(int(abs_i)) == abs_i);
+      const bool val_r_is_real_int = (is_real<T>::yes) && arma_isfinite(val_r) && (val_r > T_int_lower) && (val_r < T_int_upper) && (T(int(val_r)) == val_r);
+      const bool abs_i_is_real_int = (is_real<T>::yes) && arma_isfinite(abs_i)                          && (abs_i < T_int_upper) && (T(int(abs_i)) == abs_i);
       
       (val_r_is_real_int) ? arma_ostream::raw_print_elem(f, int(val_r)) : arma_ostream::raw_print_elem(f, val_r);
       
@@ -1041,9 +1086,9 @@ diskio::save_coord_ascii(const Mat<eT>& x, std::ostream& f)
   
   diskio::prepare_stream<eT>(f);
   
-  const eT eT_zero       = eT(0);
-  const eT eT_int_lowest = eT(std::numeric_limits<int>::lowest());
-  const eT eT_int_max    = eT(std::numeric_limits<int>::max());
+  constexpr eT eT_zero      = eT(0);
+  constexpr eT eT_int_lower = diskio::real_as_int_lower_limit<eT>();
+  constexpr eT eT_int_upper = diskio::real_as_int_upper_limit<eT>();
   
   for(uword col=0; col < x.n_cols; ++col)
   for(uword row=0; row < x.n_rows; ++row)
@@ -1055,7 +1100,7 @@ diskio::save_coord_ascii(const Mat<eT>& x, std::ostream& f)
     f << row;  f.put(' ');
     f << col;  f.put(' ');
     
-    const bool is_real_int = (is_real<eT>::yes) && arma_isfinite(val) && (val > eT_int_lowest) && (val < eT_int_max) && (eT(int(val)) == val);
+    const bool is_real_int = (is_real<eT>::yes) && arma_isfinite(val) && (val > eT_int_lower) && (val < eT_int_upper) && (eT(int(val)) == val);
     
     (is_real_int) ? arma_ostream::raw_print_elem(f, int(val)) : arma_ostream::raw_print_elem(f, val);
     
@@ -1096,9 +1141,9 @@ diskio::save_coord_ascii(const Mat< std::complex<T> >& x, std::ostream& f)
   
   diskio::prepare_stream<eT>(f);
   
-  const eT eT_zero       = eT(0);
-  const  T  T_int_lowest = T(std::numeric_limits<int>::lowest());
-  const  T  T_int_max    = T(std::numeric_limits<int>::max());
+  constexpr eT eT_zero      = eT(0);
+  constexpr  T  T_int_lower = diskio::real_as_int_lower_limit<T>();
+  constexpr  T  T_int_upper = diskio::real_as_int_upper_limit<T>();
   
   for(uword col=0; col < x.n_cols; ++col)
   for(uword row=0; row < x.n_rows; ++row)
@@ -1113,8 +1158,8 @@ diskio::save_coord_ascii(const Mat< std::complex<T> >& x, std::ostream& f)
     const T val_r = std::real(val);
     const T val_i = std::imag(val);
     
-    const bool val_r_is_real_int = (is_real<T>::yes) && arma_isfinite(val_r) && (val_r > T_int_lowest) && (val_r < T_int_max) && (T(int(val_r)) == val_r);
-    const bool val_i_is_real_int = (is_real<T>::yes) && arma_isfinite(val_i) && (val_i > T_int_lowest) && (val_i < T_int_max) && (T(int(val_i)) == val_i);
+    const bool val_r_is_real_int = (is_real<T>::yes) && arma_isfinite(val_r) && (val_r > T_int_lower) && (val_r < T_int_upper) && (T(int(val_r)) == val_r);
+    const bool val_i_is_real_int = (is_real<T>::yes) && arma_isfinite(val_i) && (val_i > T_int_lower) && (val_i < T_int_upper) && (T(int(val_i)) == val_i);
     
     (val_r_is_real_int) ? arma_ostream::raw_print_elem(f, int(val_r)) : arma_ostream::raw_print_elem(f, val_r);
     
@@ -2946,9 +2991,9 @@ diskio::save_csv_ascii(const SpMat<eT>& x, std::ostream& f, const char separator
   uword x_n_rows = x.n_rows;
   uword x_n_cols = x.n_cols;
   
-  const eT eT_zero       = eT(0);
-  const eT eT_int_lowest = eT(std::numeric_limits<int>::lowest());
-  const eT eT_int_max    = eT(std::numeric_limits<int>::max());
+  constexpr eT eT_zero      = eT(0);
+  constexpr eT eT_int_lower = diskio::real_as_int_lower_limit<eT>();
+  constexpr eT eT_int_upper = diskio::real_as_int_upper_limit<eT>();
   
   for(uword row=0; row < x_n_rows; ++row)
     {
@@ -2962,7 +3007,7 @@ diskio::save_csv_ascii(const SpMat<eT>& x, std::ostream& f, const char separator
         }
       else
         {
-        const bool is_real_int = (is_real<eT>::yes) && arma_isfinite(val) && (val > eT_int_lowest) && (val < eT_int_max) && (eT(int(val)) == val);
+        const bool is_real_int = (is_real<eT>::yes) && arma_isfinite(val) && (val > eT_int_lower) && (val < eT_int_upper) && (eT(int(val)) == val);
         
         (is_real_int) ? arma_ostream::raw_print_elem(f, int(val)) : arma_ostream::raw_print_elem(f, val);
         }
@@ -3044,8 +3089,8 @@ diskio::save_coord_ascii(const SpMat<eT>& x, std::ostream& f)
   
   diskio::prepare_stream<eT>(f);
   
-  const eT eT_int_lowest = eT(std::numeric_limits<int>::lowest());
-  const eT eT_int_max    = eT(std::numeric_limits<int>::max());
+  constexpr eT eT_int_lower = diskio::real_as_int_lower_limit<eT>();
+  constexpr eT eT_int_upper = diskio::real_as_int_upper_limit<eT>();
   
   typename SpMat<eT>::const_iterator iter     = x.begin();
   typename SpMat<eT>::const_iterator iter_end = x.end();
@@ -3057,7 +3102,7 @@ diskio::save_coord_ascii(const SpMat<eT>& x, std::ostream& f)
     
     const eT val = (*iter);
     
-    const bool is_real_int = (is_real<eT>::yes) && arma_isfinite(val) && (val > eT_int_lowest) && (val < eT_int_max) && (eT(int(val)) == val);
+    const bool is_real_int = (is_real<eT>::yes) && arma_isfinite(val) && (val > eT_int_lower) && (val < eT_int_upper) && (eT(int(val)) == val);
     
     (is_real_int) ? arma_ostream::raw_print_elem(f, int(val)) : arma_ostream::raw_print_elem(f, val);
     
@@ -3100,8 +3145,8 @@ diskio::save_coord_ascii(const SpMat< std::complex<T> >& x, std::ostream& f)
   
   diskio::prepare_stream<eT>(f);
   
-  const T T_int_lowest = T(std::numeric_limits<int>::lowest());
-  const T T_int_max    = T(std::numeric_limits<int>::max());
+  constexpr T T_int_lower = diskio::real_as_int_lower_limit<T>();
+  constexpr T T_int_upper = diskio::real_as_int_upper_limit<T>();
   
   typename SpMat<eT>::const_iterator iter     = x.begin();
   typename SpMat<eT>::const_iterator iter_end = x.end();
@@ -3116,8 +3161,8 @@ diskio::save_coord_ascii(const SpMat< std::complex<T> >& x, std::ostream& f)
     const T val_r = std::real(val);
     const T val_i = std::imag(val);
     
-    const bool val_r_is_real_int = (is_real<T>::yes) && arma_isfinite(val_r) && (val_r > T_int_lowest) && (val_r < T_int_max) && (T(int(val_r)) == val_r);
-    const bool val_i_is_real_int = (is_real<T>::yes) && arma_isfinite(val_i) && (val_i > T_int_lowest) && (val_i < T_int_max) && (T(int(val_i)) == val_i);
+    const bool val_r_is_real_int = (is_real<T>::yes) && arma_isfinite(val_r) && (val_r > T_int_lower) && (val_r < T_int_upper) && (T(int(val_r)) == val_r);
+    const bool val_i_is_real_int = (is_real<T>::yes) && arma_isfinite(val_i) && (val_i > T_int_lower) && (val_i < T_int_upper) && (T(int(val_i)) == val_i);
     
     (val_r_is_real_int) ? arma_ostream::raw_print_elem(f, int(val_r)) : arma_ostream::raw_print_elem(f, val_r);
     

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -91,7 +91,7 @@ class Row : public Mat<eT>
   inline            Row(const subview_cube<eT>& X);
   inline Row& operator=(const subview_cube<eT>& X);
   
-  arma_frown("use braced initialiser list instead") inline mat_injector<Row> operator<<(const eT val);
+  [[deprecated("use braced initialiser list instead")]] inline mat_injector<Row> operator<<(const eT val);
   
   arma_warn_unused arma_inline const Op<Row<eT>,op_htrans>  t() const;
   arma_warn_unused arma_inline const Op<Row<eT>,op_htrans> ht() const;
@@ -141,8 +141,8 @@ class Row : public Mat<eT>
   
   template<typename T1> inline void shed_cols(const Base<uword, T1>& indices);
   
-  arma_deprecated inline void insert_cols(const uword col_num, const uword N, const bool set_to_zero);
-                  inline void insert_cols(const uword col_num, const uword N);
+  [[deprecated]] inline void insert_cols(const uword col_num, const uword N, const bool set_to_zero);
+                 inline void insert_cols(const uword col_num, const uword N);
   
   template<typename T1> inline void insert_cols(const uword col_num, const Base<eT,T1>& X);
   
@@ -154,6 +154,11 @@ class Row : public Mat<eT>
   arma_warn_unused arma_inline const eT& at(const uword in_row, const uword in_col) const;
   
   
+  inline constexpr bool is_vec()    const { return true;  }
+  inline constexpr bool is_rowvec() const { return true;  }
+  inline constexpr bool is_colvec() const { return false; }
+  
+  
   typedef       eT*       row_iterator;
   typedef const eT* const_row_iterator;
   
@@ -162,6 +167,9 @@ class Row : public Mat<eT>
   
   inline       row_iterator end_row  (const uword row_num);
   inline const_row_iterator end_row  (const uword row_num) const;
+  
+  
+  inline explicit Row(const subview<eT>& X, const bool reuse_mem);  // only to be used by the partial_unwrap class
   
   
   template<uword fixed_n_elem> class fixed;

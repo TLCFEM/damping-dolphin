@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -382,19 +382,21 @@ struct quasi_unwrap< subview_row<eT> >
   {
   inline
   quasi_unwrap(const subview_row<eT>& A)
-    : M(A)
+    : sv( A                    )
+    , M ( A, (A.m.n_rows == 1) )
     {
     arma_debug_sigprint();
     }
   
-  Row<eT> M;
+  const subview_row<eT>& sv;
+  const Row<eT>          M;
   
-  static constexpr bool is_const     = false;
-  static constexpr bool has_subview  = false;
-  static constexpr bool has_orig_mem = false;
+  static constexpr bool is_const     = true;
+  static constexpr bool has_subview  = true;
+  static constexpr bool has_orig_mem = false;  // NOTE: set to false as this is the general case; original memory is only used when the subview is a contiguous chunk
   
   template<typename eT2>
-  constexpr bool is_alias(const Mat<eT2>&) const { return false; }
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return (is_same_type<eT,eT2>::yes) && ( (sv.m.n_rows == 1) ? (void_ptr(&X) == void_ptr(&(sv.m))) : false ); }
   };
 
 
@@ -512,7 +514,7 @@ struct quasi_unwrap< Op<T1, op_vectorise_col> >
   static constexpr bool has_orig_mem = true;
   
   template<typename eT2>
-  arma_inline bool is_alias(const Mat<eT2>& X) const { return U.is_alias(X); }
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return (is_same_type<eT,eT2>::yes) && U.is_alias(X); }
   };
 
 
@@ -1430,7 +1432,8 @@ struct partial_unwrap< subview_row<eT> >
   
   inline
   partial_unwrap(const subview_row<eT>& A)
-    : M(A)
+    : sv( A                    )
+    , M ( A, (A.m.n_rows == 1) )
     {
     arma_debug_sigprint();
     }
@@ -1438,13 +1441,14 @@ struct partial_unwrap< subview_row<eT> >
   constexpr eT get_val() const { return eT(1); }
   
   template<typename eT2>
-  constexpr bool is_alias(const Mat<eT2>&) const { return false; }
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return (sv.m.n_rows == 1) ? (void_ptr(&X) == void_ptr(&(sv.m))) : false; }
   
   static constexpr bool do_trans = false;
   static constexpr bool do_times = false;
-  static constexpr bool is_fast  = false;
+  static constexpr bool is_fast  = false;  // can't determine at compile time that memory is reused
   
-  const Row<eT> M;
+  const subview_row<eT>& sv;
+  const Row<eT>          M;
   };
 
 

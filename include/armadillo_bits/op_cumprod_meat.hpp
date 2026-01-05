@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -144,6 +144,28 @@ op_cumprod::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_cumprod>& in)
 template<typename T1>
 inline
 void
+op_cumprod::apply(Mat_noalias<typename T1::elem_type>& out, const Op<T1,op_cumprod>& in)
+  {
+  arma_debug_sigprint();
+  
+  const uword dim = in.aux_uword_a;
+  
+  arma_conform_check( (dim > 1), "cumprod(): parameter 'dim' must be 0 or 1" );
+  
+  const quasi_unwrap<T1> U(in.m);
+  
+  op_cumprod::apply_noalias(out, U.M, dim);
+  }
+
+
+
+//
+
+
+
+template<typename T1>
+inline
+void
 op_cumprod_vec::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_cumprod_vec>& in)
   {
   arma_debug_sigprint();
@@ -170,5 +192,20 @@ op_cumprod_vec::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_cumprod_v
 
 
 
-//! @}
+template<typename T1>
+inline
+void
+op_cumprod_vec::apply(Mat_noalias<typename T1::elem_type>& out, const Op<T1,op_cumprod_vec>& in)
+  {
+  arma_debug_sigprint();
+  
+  const quasi_unwrap<T1> U(in.m);
+  
+  const uword dim = (T1::is_xvec) ? uword(U.M.is_rowvec() ? 1 : 0) : uword((T1::is_row) ? 1 : 0);
+  
+  op_cumprod::apply_noalias(out, U.M, dim);
+  }
 
+
+
+//! @}
