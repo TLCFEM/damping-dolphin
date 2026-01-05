@@ -17,6 +17,8 @@
 
 #include "full_selection.hpp"
 #include "random_selection.hpp"
+#include "transformation_policies/empty_transformation.hpp"
+#include "transformation_policies/boundary_box_constraint.hpp"
 
 namespace ens {
 
@@ -46,8 +48,12 @@ namespace ens {
  * ensmallen website.
  *
  * @tparam SelectionPolicy The selection strategy used for the evaluation step.
+ * @tparam TransformationPolicy The transformation strategy used to
+ *       map decision variables to the desired domain during fitness evaluation
+ *       and termination. Use EmptyTransformation if the domain isn't bounded.
  */
-template<typename SelectionPolicyType = FullSelection>
+template<typename SelectionPolicyType = FullSelection,
+         typename TransformationPolicyType = EmptyTransformation<>>
 class CMAES
 {
  public:
@@ -60,22 +66,24 @@ class CMAES
    * equal one pass over the dataset).
    *
    * @param lambda The population size (0 use the default size).
-   * @param lowerBound Lower bound of decision variables.
-   * @param upperBound Upper bound of decision variables.
+   * @param transformationPolicy Instantiated transformation policy used to
+   *     map the coordinates to the desired domain.
    * @param batchSize Batch size to use for the objective calculation.
    * @param maxIterations Maximum number of iterations allowed (0 means no
    *     limit).
    * @param tolerance Maximum absolute tolerance to terminate algorithm.
    * @param selectionPolicy Instantiated selection policy used to calculate the
    *     objective.
+   * @param stepSize Starting sigma/step size (will be modified).
    */
   CMAES(const size_t lambda = 0,
-        const double lowerBound = -10,
-        const double upperBound = 10,
+        const TransformationPolicyType&
+              transformationPolicy = TransformationPolicyType(),
         const size_t batchSize = 32,
         const size_t maxIterations = 1000,
         const double tolerance = 1e-5,
-        const SelectionPolicyType& selectionPolicy = SelectionPolicyType());
+        const SelectionPolicyType& selectionPolicy = SelectionPolicyType(),
+        double stepSize = 0);
 
   /**
    * Optimize the given function using CMA-ES. The given starting point will be
@@ -91,26 +99,16 @@ class CMAES
    * @return Objective value of the final point.
    */
   template<typename SeparableFunctionType,
-           typename MatType,
-           typename... CallbackTypes>
-  typename MatType::elem_type Optimize(SeparableFunctionType& function,
-                                       MatType& iterate,
-                                       CallbackTypes&&... callbacks);
+      typename MatType,
+      typename... CallbackTypes>
+      typename MatType::elem_type Optimize(SeparableFunctionType& function,
+          MatType& iterate,
+          CallbackTypes&&... callbacks);
 
   //! Get the population size.
   size_t PopulationSize() const { return lambda; }
   //! Modify the population size.
   size_t& PopulationSize() { return lambda; }
-
-  //! Get the lower bound of decision variables.
-  double LowerBound() const { return lowerBound; }
-  //! Modify the lower bound of decision variables.
-  double& LowerBound() { return lowerBound; }
-
-  //! Get the upper bound of decision variables
-  double UpperBound() const { return upperBound; }
-  //! Modify the upper bound of decision variables
-  double& UpperBound() { return upperBound; }
 
   //! Get the batch size.
   size_t BatchSize() const { return batchSize; }
@@ -132,15 +130,24 @@ class CMAES
   //! Modify the selection policy.
   SelectionPolicyType& SelectionPolicy() { return selectionPolicy; }
 
+  //! Get the transformation policy.
+  const TransformationPolicyType& TransformationPolicy() const
+  { return transformationPolicy; }
+  //! Modify the transformation policy.
+  TransformationPolicyType& TransformationPolicy()
+  { return transformationPolicy; }
+
+  //! Get the step size.
+  double StepSize() const { return stepSize; }
+  //! Modify the step size.
+  double& StepSize() { return stepSize; }
+
+  //! Get the total number of function evaluations.
+  size_t FunctionEvaluations() const  { return functionEvaluations; }
+
  private:
   //! Population size.
   size_t lambda;
-
-  //! Lower bound of decision variables.
-  double lowerBound;
-
-  //! Upper bound of decision variables
-  double upperBound;
 
   //! The batch size for processing.
   size_t batchSize;
@@ -153,13 +160,25 @@ class CMAES
 
   //! The selection policy used to calculate the objective.
   SelectionPolicyType selectionPolicy;
+
+  //! The transformationPolicy used to map coordinates to the suitable domain
+  //! while evaluating fitness. This mapping is also done after optimization
+  //! has completed.
+  TransformationPolicyType transformationPolicy;
+
+  //! The step size.
+  double stepSize;
+
+  //! Counter for the number of function evaluations.
+  size_t functionEvaluations = 0;
 };
 
 /**
  * Convenient typedef for CMAES approximation.
  */
-template<typename SelectionPolicyType = RandomSelection>
-using ApproxCMAES = CMAES<SelectionPolicyType>;
+template<typename TransformationPolicyType = EmptyTransformation<>,
+         typename SelectionPolicyType = RandomSelection>
+using ApproxCMAES = CMAES<SelectionPolicyType, TransformationPolicyType>;
 
 } // namespace ens
 

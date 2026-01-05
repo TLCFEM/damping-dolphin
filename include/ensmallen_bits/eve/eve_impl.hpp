@@ -49,8 +49,8 @@ template<typename SeparableFunctionType,
          typename MatType,
          typename GradType,
          typename... CallbackTypes>
-typename std::enable_if<IsArmaType<GradType>::value,
-typename MatType::elem_type>::type
+typename std::enable_if<IsMatrixType<GradType>::value,
+    typename MatType::elem_type>::type
 Eve::Optimize(SeparableFunctionType& function,
               MatType& iterateIn,
               CallbackTypes&&... callbacks)
@@ -98,7 +98,7 @@ Eve::Optimize(SeparableFunctionType& function,
   v.zeros();
 
   // Now iterate!
-  terminate |= Callback::BeginOptimization(*this, f, iterate, callbacks...);
+  Callback::BeginOptimization(*this, f, iterate, callbacks...);
   BaseGradType gradient(iterate.n_rows, iterate.n_cols);
   const size_t actualMaxIterations = (maxIterations == 0) ?
       std::numeric_limits<size_t>::max() : maxIterations;
@@ -123,30 +123,40 @@ Eve::Optimize(SeparableFunctionType& function,
 
     terminate |= Callback::EvaluateWithGradient(*this, f, iterate,
         objective, gradient, callbacks...);
+    if (terminate)
+      break;
 
-    m *= beta1;
-    m += (1 - beta1) * gradient;
+    m *= ElemType(beta1);
+    m += (1 - ElemType(beta1)) * gradient;
 
-    v *= beta2;
-    v += (1 - beta2) * (gradient % gradient);
+    v *= ElemType(beta2);
+    v += (1 - ElemType(beta2)) * (gradient % gradient);
 
-    const double biasCorrection1 = 1.0 - std::pow(beta1, (double) (i + 1));
-    const double biasCorrection2 = 1.0 - std::pow(beta2, (double) (i + 1));
+    const ElemType biasCorrection1 =
+        1 - std::pow(ElemType(beta1), ElemType(i + 1));
+    const ElemType biasCorrection2 =
+        1 - std::pow(ElemType(beta2), ElemType(i + 1));
 
     if (i > 0)
     {
       const ElemType d = std::abs(objective - lastObjective) /
-          (std::min(objective, lastObjective) + epsilon);
+          (std::min(objective, lastObjective) + ElemType(epsilon));
 
-      dt *= beta3;
-      dt += (1 - beta3) * std::min(std::max(d, ElemType(1.0 / clip)),
+      dt *= ElemType(beta3);
+      dt += (1 - ElemType(beta3)) * std::min(std::max(d, ElemType(1.0 / clip)),
           ElemType(clip));
     }
 
     lastObjective = objective;
 
-    iterate -= stepSize / dt * (m / biasCorrection1) /
-        (arma::sqrt(v / biasCorrection2) + epsilon);
+    // TODO: remove in ensmallen 4.0.0.
+    #if defined(ENS_OLD_SEPARABLE_STEP_BEHAVIOR)
+    iterate -= ElemType(stepSize) / dt * (m / biasCorrection1) /
+        (sqrt(v / biasCorrection2) + ElemType(epsilon));
+    #else
+    iterate -= (ElemType(stepSize) / (dt * effectiveBatchSize)) *
+        (m / biasCorrection1) / (sqrt(v / biasCorrection2) + ElemType(epsilon));
+    #endif
 
     terminate |= Callback::StepTaken(*this, f, iterate, callbacks...);
 
@@ -172,9 +182,7 @@ Eve::Optimize(SeparableFunctionType& function,
         return overallObjective;
       }
 
-      if (std::abs(lastOverallObjective - overallObjective) < tolerance ||
-          Callback::BeginEpoch(*this, f, iterate, epoch, overallObjective,
-              callbacks...))
+      if (std::abs(lastOverallObjective - overallObjective) < tolerance)
       {
         Info << "Eve: minimized within tolerance " << tolerance << "; "
             << "terminating optimization." << std::endl;
@@ -182,6 +190,9 @@ Eve::Optimize(SeparableFunctionType& function,
         Callback::EndOptimization(*this, f, iterate, callbacks...);
         return overallObjective;
       }
+
+      terminate |= Callback::BeginEpoch(*this, f, iterate, epoch,
+          overallObjective, callbacks...);
 
       // Reset the counter variables.
       lastOverallObjective = overallObjective;
@@ -206,7 +217,9 @@ Eve::Optimize(SeparableFunctionType& function,
       const ElemType objective = f.Evaluate(iterate, i, effectiveBatchSize);
       overallObjective += objective;
 
-      Callback::Evaluate(*this, f, iterate, objective, callbacks...);
+      // The optimization is finished, so we don't need to care about the result
+      // of the callback.
+      (void) Callback::Evaluate(*this, f, iterate, objective, callbacks...);
     }
   }
 

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,7 +26,7 @@ inline
 void
 op_median::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_median>& expr)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   typedef typename T1::elem_type eT;
   
@@ -34,14 +34,14 @@ op_median::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_median>& expr)
   
   const uword dim = expr.aux_uword_a;
   
-  arma_debug_check( U.M.has_nan(), "median(): detected NaN"                   );
-  arma_debug_check( (dim > 1),     "median(): parameter 'dim' must be 0 or 1" );
+  arma_conform_check( U.M.internal_has_nan(), "median(): detected NaN"                   );
+  arma_conform_check( (dim > 1),              "median(): parameter 'dim' must be 0 or 1" );
   
   if(U.is_alias(out))
     {
     Mat<eT> tmp;
     
-    op_median::apply_noalias(out, U.M, dim);
+    op_median::apply_noalias(tmp, U.M, dim);
     
     out.steal_mem(tmp);
     }
@@ -53,12 +53,31 @@ op_median::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_median>& expr)
 
 
 
+template<typename T1>
+inline
+void
+op_median::apply(Mat_noalias<typename T1::elem_type>& out, const Op<T1,op_median>& expr)
+  {
+  arma_debug_sigprint();
+  
+  const quasi_unwrap<T1> U(expr.m);
+  
+  const uword dim = expr.aux_uword_a;
+  
+  arma_conform_check( U.M.internal_has_nan(), "median(): detected NaN"                   );
+  arma_conform_check( (dim > 1),              "median(): parameter 'dim' must be 0 or 1" );
+  
+  op_median::apply_noalias(out, U.M, dim);
+  }
+
+
+
 template<typename eT>
 inline
 void
 op_median::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword dim, const typename arma_not_cx<eT>::result* junk)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   arma_ignore(junk);
   
   const uword X_n_rows = X.n_rows;
@@ -66,7 +85,7 @@ op_median::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword dim, const 
   
   if(dim == 0)  // in each column
     {
-    arma_extra_debug_print("op_median::apply(): dim = 0");
+    arma_debug_print("op_median::apply(): dim = 0");
     
     out.set_size((X_n_rows > 0) ? 1 : 0, X_n_cols);
     
@@ -85,7 +104,7 @@ op_median::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword dim, const 
   else
   if(dim == 1)  // in each row
     {
-    arma_extra_debug_print("op_median::apply(): dim = 1");
+    arma_debug_print("op_median::apply(): dim = 1");
     
     out.set_size(X_n_rows, (X_n_cols > 0) ? 1 : 0);
     
@@ -110,7 +129,7 @@ inline
 void
 op_median::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword dim, const typename arma_cx_only<eT>::result* junk)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   arma_ignore(junk);
   
   typedef typename get_pod_type<eT>::result T;
@@ -120,7 +139,7 @@ op_median::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword dim, const 
   
   if(dim == 0)  // in each column
     {
-    arma_extra_debug_print("op_median::apply(): dim = 0");
+    arma_debug_print("op_median::apply(): dim = 0");
     
     out.set_size((X_n_rows > 0) ? 1 : 0, X_n_cols);
     
@@ -149,7 +168,7 @@ op_median::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword dim, const 
   else
   if(dim == 1)  // in each row
     {
-    arma_extra_debug_print("op_median::apply(): dim = 1");
+    arma_debug_print("op_median::apply(): dim = 1");
     
     out.set_size(X_n_rows, (X_n_cols > 0) ? 1 : 0);
     
@@ -186,7 +205,7 @@ op_median::median_vec
   const typename arma_not_cx<typename T1::elem_type>::result* junk
   )
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   arma_ignore(junk);
   
   typedef typename T1::elem_type eT;
@@ -197,12 +216,12 @@ op_median::median_vec
   
   if(n_elem == 0)
     {
-    arma_debug_check(true, "median(): object has no elements");
+    arma_conform_check(true, "median(): object has no elements");
     
     return Datum<eT>::nan;
     }
   
-  arma_debug_check( U.M.has_nan(), "median(): detected NaN" );
+  arma_conform_check( U.M.internal_has_nan(), "median(): detected NaN" );
   
   std::vector<eT> tmp_vec(n_elem);
   
@@ -222,7 +241,7 @@ op_median::median_vec
   const typename arma_cx_only<typename T1::elem_type>::result* junk
   )
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   arma_ignore(junk);
   
   typedef typename T1::elem_type eT;
@@ -234,12 +253,12 @@ op_median::median_vec
   
   if(n_elem == 0)
     {
-    arma_debug_check(true, "median(): object has no elements");
+    arma_conform_check(true, "median(): object has no elements");
     
     return Datum<eT>::nan;
     }
   
-  arma_debug_check( U.M.has_nan(), "median(): detected NaN" );
+  arma_conform_check( U.M.internal_has_nan(), "median(): detected NaN" );
   
   std::vector< arma_cx_median_packet<T> > tmp_vec(n_elem);
   
@@ -265,7 +284,7 @@ inline
 eT
 op_median::direct_median(std::vector<eT>& X)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   const uword n_elem = uword(X.size());
   const uword half   = n_elem/2;
@@ -304,7 +323,7 @@ op_median::direct_cx_median_index
   std::vector< arma_cx_median_packet<T> >& X
   )
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   typedef arma_cx_median_packet<T> eT;
   

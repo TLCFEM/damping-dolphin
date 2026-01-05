@@ -45,8 +45,8 @@ template<typename SeparableFunctionType,
          typename MatType,
          typename GradType,
          typename... CallbackTypes>
-typename std::enable_if<IsArmaType<GradType>::value,
-typename MatType::elem_type>::type
+typename std::enable_if<IsMatrixType<GradType>::value,
+    typename MatType::elem_type>::type
 SARAHType<UpdatePolicyType>::Optimize(
     SeparableFunctionType& functionIn,
     MatType& iterateIn,
@@ -91,8 +91,7 @@ SARAHType<UpdatePolicyType>::Optimize(
 
   const size_t actualMaxIterations = (maxIterations == 0) ?
       std::numeric_limits<size_t>::max() : maxIterations;
-  terminate |= Callback::BeginOptimization(*this, function, iterate,
-      callbacks...);
+  Callback::BeginOptimization(*this, function, iterate, callbacks...);
   for (size_t i = 0; i < actualMaxIterations && !terminate; ++i)
   {
     // Calculate the objective function.
@@ -104,7 +103,8 @@ SARAHType<UpdatePolicyType>::Optimize(
           effectiveBatchSize);
       overallObjective += objective;
 
-      Callback::Evaluate(*this, function, iterate, objective, callbacks...);
+      terminate |= Callback::Evaluate(*this, function, iterate, objective,
+          callbacks...);
     }
 
     if (std::isnan(overallObjective) || std::isinf(overallObjective))
@@ -145,12 +145,15 @@ SARAHType<UpdatePolicyType>::Optimize(
 
       f += effectiveBatchSize;
     }
-    v /= (double) numFunctions;
+    v /= (ElemType) numFunctions;
+
+    if (terminate)
+      break;
 
     // Update iterate with full gradient (v).
-    iterate -= stepSize * v;
+    iterate -= ElemType(stepSize) * v;
 
-    const ElemType vNorm = arma::norm(v);
+    const ElemType vNorm = norm(v);
 
     for (size_t f = 0, currentFunction = 0; f < innerIterations;
         /* incrementing done manually */)
@@ -189,7 +192,7 @@ SARAHType<UpdatePolicyType>::Optimize(
         iterate0 = iterate;
 
         // Use the update policy to take a step.
-        if (updatePolicy.Update(iterate, v, gradient, gradient0,
+        if (terminate || updatePolicy.Update(iterate, v, gradient, gradient0,
             effectiveBatchSize, stepSize, vNorm))
         {
           break;
@@ -202,7 +205,7 @@ SARAHType<UpdatePolicyType>::Optimize(
         iterate0 = iterate;
 
         // Use the update policy to take a step.
-        if (updatePolicy.Update(iterate, v, gradient, gradient,
+        if (terminate || updatePolicy.Update(iterate, v, gradient, gradient,
             effectiveBatchSize, stepSize, vNorm))
         {
           break;
@@ -225,10 +228,14 @@ SARAHType<UpdatePolicyType>::Optimize(
     for (size_t i = 0; i < numFunctions; i += batchSize)
     {
       const size_t effectiveBatchSize = std::min(batchSize, numFunctions - i);
-      const ElemType objective = function.Evaluate(iterate, i, effectiveBatchSize);
+      const ElemType objective = function.Evaluate(iterate, i,
+          effectiveBatchSize);
       overallObjective += objective;
 
-      Callback::Evaluate(*this, function, iterate, objective, callbacks...);
+      // The optimization is finished, so we don't need to care about the result
+      // of the callback.
+      (void) Callback::Evaluate(*this, function, iterate, objective,
+          callbacks...);
     }
   }
 

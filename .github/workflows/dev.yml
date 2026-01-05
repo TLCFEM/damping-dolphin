@@ -21,7 +21,7 @@ jobs:
           echo "DD_TIME=DD-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
           sudo apt-get install -y libfuse2
           mkdir build && cd build
-          cmake -DCMAKE_BUILD_TYPE=release -DCOMPILE_TBB=ON ../
+          cmake -DCMAKE_BUILD_TYPE=release -DDD_USE_TBB=ON ../
           make -j"$(nproc)"
           wget -q https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
           chmod +x linuxdeployqt-continuous-x86_64.AppImage

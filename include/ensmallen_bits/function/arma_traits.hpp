@@ -77,11 +77,6 @@ struct MatTypeTraits<arma::SpSubview<eT>>
 };
 
 
-#if ((ARMA_VERSION_MAJOR >= 10) || \
-    ((ARMA_VERSION_MAJOR == 9) && (ARMA_VERSION_MINOR >= 869)))
-
-// Armadillo 9.869+ has SpSubview_col and SpSubview_row
-
 template<typename eT>
 struct MatTypeTraits<arma::SpSubview_col<eT>>
 {
@@ -97,9 +92,6 @@ struct MatTypeTraits<arma::SpSubview_row<eT>>
       "Armadillo subviews cannot be passed to Optimize()!  Create a matrix "
       "or a matrix alias instead!");
 };
-
-#endif
-
 
 template<typename eT>
 struct MatTypeTraits<arma::Cube<eT>>
@@ -130,6 +122,17 @@ template<>
 inline void RequireDenseFloatingPointType<arma::mat>() { }
 template<>
 inline void RequireDenseFloatingPointType<arma::fmat>() { }
+#if defined(ARMA_HAVE_FP16)
+template<>
+inline void RequireDenseFloatingPointType<arma::hmat>() { }
+#endif
+
+#ifdef ENS_HAVE_COOT
+template<>
+inline void RequireDenseFloatingPointType<coot::mat>() { }
+template<>
+inline void RequireDenseFloatingPointType<coot::fmat>() { }
+#endif
 
 template<typename MatType>
 void RequireFloatingPointType()
@@ -152,6 +155,19 @@ template<>
 inline void RequireFloatingPointType<arma::sp_mat>() { }
 template<>
 inline void RequireFloatingPointType<arma::sp_fmat>() { }
+#if defined(ARMA_HAVE_FP16)
+template<>
+inline void RequireFloatingPointType<arma::hmat>() { }
+template<>
+inline void RequireFloatingPointType<arma::sp_hmat>() { }
+#endif
+
+#ifdef ENS_HAVE_COOT
+template<>
+inline void RequireFloatingPointType<coot::mat>() { }
+template<>
+inline void RequireFloatingPointType<coot::fmat>() { }
+#endif
 
 /**
  * Require that the internal element type of the matrix type and gradient type

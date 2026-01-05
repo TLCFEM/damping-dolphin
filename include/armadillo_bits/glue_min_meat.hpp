@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,7 +27,7 @@ inline
 void
 glue_min::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, glue_min>& X)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   typedef typename T1::elem_type eT;
   
@@ -55,12 +55,12 @@ inline
 void
 glue_min::apply(Mat<eT>& out, const Proxy<T1>& PA, const Proxy<T2>& PB)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   const uword n_rows = PA.get_n_rows();
   const uword n_cols = PA.get_n_cols();
   
-  arma_debug_assert_same_size(n_rows, n_cols, PB.get_n_rows(), PB.get_n_cols(), "element-wise min()");
+  arma_conform_assert_same_size(n_rows, n_cols, PB.get_n_rows(), PB.get_n_cols(), "element-wise min()");
   
   const arma_lt_comparator<eT> comparator;
   
@@ -105,7 +105,7 @@ inline
 void
 glue_min::apply(Cube<typename T1::elem_type>& out, const GlueCube<T1, T2, glue_min>& X)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   typedef typename T1::elem_type eT;
   
@@ -133,13 +133,13 @@ inline
 void
 glue_min::apply(Cube<eT>& out, const ProxyCube<T1>& PA, const ProxyCube<T2>& PB)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   const uword n_rows   = PA.get_n_rows();
   const uword n_cols   = PA.get_n_cols();
   const uword n_slices = PA.get_n_slices();
   
-  arma_debug_assert_same_size(n_rows, n_cols, n_slices, PB.get_n_rows(), PB.get_n_cols(), PB.get_n_slices(), "element-wise min()");
+  arma_conform_assert_same_size(n_rows, n_cols, n_slices, PB.get_n_rows(), PB.get_n_cols(), PB.get_n_slices(), "element-wise min()");
   
   const arma_lt_comparator<eT> comparator;
   

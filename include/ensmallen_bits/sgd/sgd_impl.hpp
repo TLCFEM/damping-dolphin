@@ -58,8 +58,8 @@ template<typename SeparableFunctionType,
          typename MatType,
          typename GradType,
          typename... CallbackTypes>
-typename std::enable_if<IsArmaType<GradType>::value,
-typename MatType::elem_type>::type
+typename std::enable_if<IsMatrixType<GradType>::value,
+    typename MatType::elem_type>::type
 SGD<UpdatePolicyType, DecayPolicyType>::Optimize(
     SeparableFunctionType& function,
     MatType& iterateIn,
@@ -124,7 +124,7 @@ SGD<UpdatePolicyType, DecayPolicyType>::Optimize(
   BaseGradType gradient(iterate.n_rows, iterate.n_cols);
   const size_t actualMaxIterations = (maxIterations == 0) ?
       std::numeric_limits<size_t>::max() : maxIterations;
-  terminate |= Callback::BeginOptimization(*this, f, iterate, callbacks...);
+  Callback::BeginOptimization(*this, f, iterate, callbacks...);
   terminate |= Callback::BeginEpoch(*this, f, iterate, epoch,
       overallObjective, callbacks...);
   for (size_t i = 0; i < actualMaxIterations && !terminate;
@@ -150,8 +150,14 @@ SGD<UpdatePolicyType, DecayPolicyType>::Optimize(
         gradient, callbacks...);
 
     // Use the update policy to take a step.
+    // TODO: remove old behavior in ensmallen 4.0.0.
+    #if defined(ENS_OLD_SEPARABLE_STEP_BEHAVIOR)
     instUpdatePolicy.As<InstUpdatePolicyType>().Update(iterate, stepSize,
         gradient);
+    #else
+    instUpdatePolicy.As<InstUpdatePolicyType>().Update(iterate,
+        (stepSize / effectiveBatchSize), gradient);
+    #endif
 
     terminate |= Callback::StepTaken(*this, f, iterate, callbacks...);
 
@@ -181,9 +187,7 @@ SGD<UpdatePolicyType, DecayPolicyType>::Optimize(
         return overallObjective;
       }
 
-      if (std::abs(lastObjective - overallObjective) < tolerance ||
-          Callback::BeginEpoch(*this, f, iterate, epoch, overallObjective,
-              callbacks...))
+      if (std::abs(lastObjective - overallObjective) < tolerance)
       {
         Info << "SGD: minimized within tolerance " << tolerance << "; "
             << "terminating optimization." << std::endl;
@@ -192,18 +196,27 @@ SGD<UpdatePolicyType, DecayPolicyType>::Optimize(
         return overallObjective;
       }
 
+      terminate |= Callback::BeginEpoch(*this, f, iterate, epoch,
+          overallObjective, callbacks...);
+
       // Reset the counter variables.
-      lastObjective = overallObjective;
-      overallObjective = 0;
-      currentFunction = 0;
+      if (i != actualMaxIterations)
+      {
+        lastObjective = overallObjective;
+        overallObjective = 0;
+        currentFunction = 0;
+      }
 
       if (shuffle) // Determine order of visitation.
         f.Shuffle();
     }
   }
 
-  Info << "SGD: maximum iterations (" << maxIterations << ") reached; "
-      << "terminating optimization." << std::endl;
+  if (!terminate)
+  {
+    Info << "SGD: maximum iterations (" << maxIterations << ") reached; "
+        << "terminating optimization." << std::endl;
+  }
 
   // Calculate final objective if exactObjective is set to true.
   if (exactObjective)
@@ -215,7 +228,9 @@ SGD<UpdatePolicyType, DecayPolicyType>::Optimize(
       const ElemType objective = f.Evaluate(iterate, i, effectiveBatchSize);
       overallObjective += objective;
 
-      Callback::Evaluate(*this, f, iterate, objective, callbacks...);
+      // The optimization is over, so it doesn't matter what the callback
+      // returns.
+      (void) Callback::Evaluate(*this, f, iterate, objective, callbacks...);
     }
   }
 

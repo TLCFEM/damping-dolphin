@@ -579,7 +579,7 @@ void MainWindow::processFittingResult(QStringList result) {
 void MainWindow::switchTheme() {
     if(ui->darkMode->checkState() == Qt::Checked) {
         QFile file(":/utilities/stylesheet_francesco.qss");
-        file.open(QFile::ReadOnly);
+        [[maybe_unused]] const auto result = file.open(QFile::ReadOnly);
         setStyleSheet(QString::fromLatin1(file.readAll()));
     }
     else

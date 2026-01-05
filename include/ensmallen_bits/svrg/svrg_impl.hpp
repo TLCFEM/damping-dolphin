@@ -55,8 +55,8 @@ template<typename SeparableFunctionType,
          typename MatType,
          typename GradType,
          typename... CallbackTypes>
-typename std::enable_if<IsArmaType<GradType>::value,
-typename MatType::elem_type>::type
+typename std::enable_if<IsMatrixType<GradType>::value,
+    typename MatType::elem_type>::type
 SVRGType<UpdatePolicyType, DecayPolicyType>::Optimize(
     SeparableFunctionType& functionIn,
     MatType& iterateIn,
@@ -129,8 +129,7 @@ SVRGType<UpdatePolicyType, DecayPolicyType>::Optimize(
 
   const size_t actualMaxIterations = (maxIterations == 0) ?
       std::numeric_limits<size_t>::max() : maxIterations;
-  terminate |= Callback::BeginOptimization(*this, function, iterate,
-      callbacks...);
+  Callback::BeginOptimization(*this, function, iterate, callbacks...);
   for (size_t i = 0; i < actualMaxIterations && !terminate; ++i)
   {
     // Calculate the objective function.
@@ -140,9 +139,13 @@ SVRGType<UpdatePolicyType, DecayPolicyType>::Optimize(
       const size_t effectiveBatchSize = std::min(batchSize, numFunctions - f);
       const ElemType objective = function.Evaluate(iterate, f,
           effectiveBatchSize);
-      Callback::Evaluate(*this, function, iterate, objective, callbacks...);
+      terminate |= Callback::Evaluate(*this, function, iterate, objective,
+          callbacks...);
       overallObjective += objective;
     }
+
+    if (terminate)
+      break;
 
     if (std::isnan(overallObjective) || std::isinf(overallObjective))
     {
@@ -186,7 +189,9 @@ SVRGType<UpdatePolicyType, DecayPolicyType>::Optimize(
 
       f += effectiveBatchSize;
     }
-    fullGradient /= (double) numFunctions;
+    fullGradient /= (ElemType) numFunctions;
+    if (terminate)
+      break;
 
     // Store current parameter for the calculation of the variance reduced
     // gradient.
@@ -219,6 +224,9 @@ SVRGType<UpdatePolicyType, DecayPolicyType>::Optimize(
       terminate |= Callback::Gradient(*this, function, iterate0, gradient0,
         callbacks...);
 
+      if (terminate)
+        break;
+
       // Use the update policy to take a step.
       instUpdatePolicy.As<InstUpdatePolicyType>().Update(iterate, fullGradient,
           gradient, gradient0, effectiveBatchSize, stepSize);
@@ -248,7 +256,10 @@ SVRGType<UpdatePolicyType, DecayPolicyType>::Optimize(
           effectiveBatchSize);
       overallObjective += objective;
 
-      Callback::Evaluate(*this, function, iterate, objective, callbacks...);
+      // The optimization is finished, so it doesn't matter what the callback
+      // returns.
+      (void) Callback::Evaluate(*this, function, iterate, objective,
+          callbacks...);
     }
   }
 

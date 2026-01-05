@@ -47,6 +47,7 @@ typename MatType::elem_type CNE::Optimize(ArbitraryFunctionType& function,
   // Convenience typedefs.
   typedef typename MatType::elem_type ElemType;
   typedef typename MatTypeTraits<MatType>::BaseMatType BaseMatType;
+  typedef typename ForwardType<MatType>::uvec UVecType;
 
   // Make sure that we have the methods that we need.  Long name...
   traits::CheckArbitraryFunctionTypeAPI<ArbitraryFunctionType,
@@ -56,7 +57,7 @@ typename MatType::elem_type CNE::Optimize(ArbitraryFunctionType& function,
   // Vector of fitness values corresponding to each candidate.
   BaseMatType fitnessValues;
   //! Index of sorted fitness values.
-  arma::uvec index;
+  UVecType index;
 
   // Make sure for evolution to work at least four candidates are present.
   if (populationSize < 4)
@@ -93,8 +94,8 @@ typename MatType::elem_type CNE::Optimize(ArbitraryFunctionType& function,
   std::vector<BaseMatType> population;
   for (size_t i = 0 ; i < populationSize; ++i)
   {
-    population.push_back(arma::randn<BaseMatType>(iterate.n_rows,
-        iterate.n_cols) + iterate);
+    population.push_back(BaseMatType(iterate.n_rows, iterate.n_cols,
+        GetFillType<MatType>::randn) + iterate);
   }
 
   // Store the number of elements in the objective matrix.
@@ -111,26 +112,26 @@ typename MatType::elem_type CNE::Optimize(ArbitraryFunctionType& function,
 
   // Find the fitness before optimization using given iterate parameters.
   ElemType lastBestFitness = function.Evaluate(iterate);
-  Callback::Evaluate(*this, function, iterate, lastBestFitness, callbacks...);
+  terminate |= Callback::Evaluate(*this, function, iterate, lastBestFitness,
+      callbacks...);
 
   // Iterate until maximum number of generations is obtained.
-  terminate |= Callback::BeginOptimization(*this, function, iterate,
-      callbacks...);
+  Callback::BeginOptimization(*this, function, iterate, callbacks...);
   for (size_t gen = 1; gen <= maxGenerations && !terminate; gen++)
   {
     // Calculating fitness values of all candidates.
     for (size_t i = 0; i < populationSize; i++)
     {
-       // Select a candidate and insert the parameters in the function.
-       iterate = population[i];
-       terminate |= Callback::StepTaken(*this, function, iterate,
-          callbacks...);
+        // Select a candidate and insert the parameters in the function.
+        iterate = population[i];
+        terminate |= Callback::StepTaken(*this, function, iterate,
+            callbacks...);
 
-       // Find fitness of candidate.
-       fitnessValues[i] = function.Evaluate(iterate);
+        // Find fitness of candidate.
+        fitnessValues[i] = function.Evaluate(iterate);
 
-       Callback::Evaluate(*this, function, iterate, fitnessValues[i],
-          callbacks...);
+        terminate |= Callback::Evaluate(*this, function, iterate,
+            fitnessValues[i], callbacks...);
     }
 
     Info << "Generation number: " << gen << " best fitness = "
@@ -154,21 +155,23 @@ typename MatType::elem_type CNE::Optimize(ArbitraryFunctionType& function,
   // Set the best candidate into the network parameters.
   iterateIn = population[index(0)];
 
+  // The output of the callback doesn't matter because the optimization is
+  // finished.
   const ElemType objective = function.Evaluate(iterate);
-  Callback::Evaluate(*this, function, iterate, objective, callbacks...);
+  (void) Callback::Evaluate(*this, function, iterate, objective, callbacks...);
 
   Callback::EndOptimization(*this, function, iterate, callbacks...);
   return objective;
 }
 
 //! Reproduce candidates to create the next generation.
-template<typename MatType>
+template<typename MatType, typename IndexType>
 inline void CNE::Reproduce(std::vector<MatType>& population,
                            const MatType& fitnessValues,
-                           arma::uvec& index)
+                           IndexType& index)
 {
   // Sort fitness values. Smaller fitness value means better performance.
-  index = arma::sort_index(fitnessValues);
+  index = sort_index(fitnessValues);
 
   // First parent.
   size_t mom;
@@ -239,17 +242,20 @@ inline void CNE::Crossover(std::vector<MatType>& population,
 }
 
 //! Modify weights with some noise for the evolution of next generation.
-template<typename MatType>
-inline void CNE::Mutate(std::vector<MatType>& population, arma::uvec& index)
+template<typename MatType, typename IndexType>
+inline void CNE::Mutate(std::vector<MatType>& population, IndexType& index)
 {
+  typedef typename MatType::elem_type ElemType;
+
   // Mutate the whole matrix with the given rate and probability.
   // The best candidate is not altered.
   for (size_t i = 1; i < populationSize; i++)
   {
-    population[index(i)] += (arma::randu<MatType>(population[index(i)].n_rows,
-        population[index(i)].n_cols) < mutationProb) %
-        (mutationSize * arma::randn<MatType>(population[index(i)].n_rows,
-        population[index(i)].n_cols));
+    population[index(i)] += conv_to<MatType>::from(
+        randu<MatType>(population[index(i)].n_rows,
+        population[index(i)].n_cols) < ElemType(mutationProb)) %
+        (ElemType(mutationSize) * MatType(population[index(i)].n_rows,
+        population[index(i)].n_cols, GetFillType<MatType>::randn));
   }
 }
 

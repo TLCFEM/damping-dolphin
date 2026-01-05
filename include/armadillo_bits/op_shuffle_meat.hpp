@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,7 +27,7 @@ inline
 void
 op_shuffle::apply_direct(Mat<eT>& out, const Mat<eT>& X, const uword dim)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   if(X.is_empty()) { out.copy_size(X); return; }
   
@@ -40,9 +40,18 @@ op_shuffle::apply_direct(Mat<eT>& out, const Mat<eT>& X, const uword dim)
   
   std::vector<packet> packet_vec(N);
   
+  podarray<int> tmp(N);
+  
+  int* tmp_mem = tmp.memptr();
+  
+  const int a = 0;
+  const int b = arma_rng::randi<int>::max_val();
+  
+  arma_rng::randi<int>::fill(tmp_mem, N, a, b);
+  
   for(uword i=0; i<N; ++i)
     {
-    packet_vec[i].val   = int(arma_rng::randi<int>());
+    packet_vec[i].val   = tmp_mem[i];
     packet_vec[i].index = i;
     }
   
@@ -56,7 +65,7 @@ op_shuffle::apply_direct(Mat<eT>& out, const Mat<eT>& X, const uword dim)
     {
     if(is_alias == false)
       {
-      arma_extra_debug_print("op_shuffle::apply(): matrix");
+      arma_debug_print("op_shuffle::apply(): matrix");
       
       out.copy_size(X);
       
@@ -71,7 +80,7 @@ op_shuffle::apply_direct(Mat<eT>& out, const Mat<eT>& X, const uword dim)
       }
     else  // in-place shuffle
       {
-      arma_extra_debug_print("op_shuffle::apply(): in-place matrix");
+      arma_debug_print("op_shuffle::apply(): in-place matrix");
       
       // reuse the val member variable of packet_vec
       // to indicate whether a particular row or column
@@ -116,7 +125,7 @@ op_shuffle::apply_direct(Mat<eT>& out, const Mat<eT>& X, const uword dim)
     {
     if(is_alias == false)
       {
-      arma_extra_debug_print("op_shuffle::apply(): vector");
+      arma_debug_print("op_shuffle::apply(): vector");
       
       out.copy_size(X);
       
@@ -145,7 +154,7 @@ op_shuffle::apply_direct(Mat<eT>& out, const Mat<eT>& X, const uword dim)
       }
     else  // in-place shuffle
       {
-      arma_extra_debug_print("op_shuffle::apply(): in-place vector");
+      arma_debug_print("op_shuffle::apply(): in-place vector");
       
       // reuse the val member variable of packet_vec
       // to indicate whether a particular row or column
@@ -202,13 +211,13 @@ inline
 void
 op_shuffle::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_shuffle>& in)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   const unwrap<T1> U(in.m);
   
   const uword dim = in.aux_uword_a;
   
-  arma_debug_check( (dim > 1), "shuffle(): parameter 'dim' must be 0 or 1" );
+  arma_conform_check( (dim > 1), "shuffle(): parameter 'dim' must be 0 or 1" );
   
   op_shuffle::apply_direct(out, U.M, dim);
   }
@@ -220,7 +229,7 @@ inline
 void
 op_shuffle_vec::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_shuffle_vec>& in)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   const unwrap<T1> U(in.m);
   

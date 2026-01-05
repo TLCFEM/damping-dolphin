@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,9 +25,48 @@
 template<typename T1>
 inline
 void
+op_pinv_default::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_pinv_default>& in)
+  {
+  arma_debug_sigprint();
+  
+  const bool status = op_pinv_default::apply_direct(out, in.m);
+  
+  if(status == false)
+    {
+    out.soft_reset();
+    arma_stop_runtime_error("pinv(): svd failed");
+    }
+  }
+
+
+
+template<typename T1>
+inline
+bool
+op_pinv_default::apply_direct(Mat<typename T1::elem_type>& out, const Base<typename T1::elem_type,T1>& expr)
+  {
+  arma_debug_sigprint();
+  
+  typedef typename T1::pod_type T;
+  
+  constexpr T     tol       = T(0);
+  constexpr uword method_id = uword(0);
+  
+  return op_pinv::apply_direct(out, expr, tol, method_id);
+  }
+
+
+
+//
+
+
+
+template<typename T1>
+inline
+void
 op_pinv::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_pinv>& in)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   typedef typename T1::pod_type T;
   
@@ -50,12 +89,12 @@ inline
 bool
 op_pinv::apply_direct(Mat<typename T1::elem_type>& out, const Base<typename T1::elem_type,T1>& expr, typename T1::pod_type tol, const uword method_id)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   typedef typename T1::elem_type eT;
   typedef typename T1::pod_type   T;
   
-  arma_debug_check((tol < T(0)), "pinv(): tolerance must be >= 0");
+  arma_conform_check((tol < T(0)), "pinv(): tolerance must be >= 0");
   
   // method_id = 0 -> default setting
   // method_id = 1 -> use standard algorithm
@@ -67,51 +106,38 @@ op_pinv::apply_direct(Mat<typename T1::elem_type>& out, const Base<typename T1::
   
   if(is_op_diagmat<T1>::value || A.is_diagmat())
     {
-    arma_extra_debug_print("op_pinv: detected diagonal matrix");
+    arma_debug_print("op_pinv: diag optimisation");
     
     return op_pinv::apply_diag(out, A, tol);
     }
   
-  bool do_sym   = false;
-  bool do_sympd = false;
+  bool do_sym = false;
   
-  const bool is_sym_size_ok = (A.n_rows > (is_cx<eT>::yes ? uword(20) : uword(40)));
-  const bool is_arg_default = ((tol == T(0)) && (method_id == uword(0)));
+  const bool is_sym_size_ok = (A.n_rows == A.n_cols) && (A.n_rows > (is_cx<eT>::yes ? uword(20) : uword(40)));
   
-  if( (arma_config::optimise_sympd) && (auxlib::crippled_lapack(A) == false) && (is_arg_default || is_sym_size_ok) )
+  if( (is_sym_size_ok) && (arma_config::optimise_sym) )
     {
-    bool is_approx_sym   = false;
-    bool is_approx_sympd = false;
+    do_sym = is_sym_expr<T1>::eval(expr.get_ref());
     
-    sympd_helper::analyse_matrix(is_approx_sym, is_approx_sympd, A);
-    
-    do_sym   = is_sym_size_ok && ((is_cx<eT>::no) ? (is_approx_sym) : (is_approx_sym && is_approx_sympd));
-    do_sympd = is_arg_default && is_approx_sympd;
-    }
-  
-  if(do_sympd)
-    {
-    arma_extra_debug_print("op_pinv: attempting sympd optimisation");
-    
-    out = A;
-    
-          bool is_sympd_junk   = false;
-          T    rcond_calc      = T(0);
-    const T    rcond_threshold = T((std::max)(uword(100), uword(A.n_rows))) * std::numeric_limits<T>::epsilon();
-    
-    const bool status = auxlib::inv_sympd_rcond(out, is_sympd_junk, rcond_calc, rcond_threshold);
-    
-    if(status && arma_isfinite(rcond_calc))  { return true; }
-    
-    arma_extra_debug_print("op_pinv: sympd optimisation failed");
-    // auxlib::inv_sympd_rcond() will fail if A isn't really positive definite or its rcond is below rcond_threshold
+    if(do_sym == false)  { do_sym = sym_helper::is_approx_sym(A); }
     }
   
   if(do_sym)
     {
-    arma_extra_debug_print("op_pinv: symmetric/hermitian optimisation");
+    arma_debug_print("op_pinv: symmetric/hermitian optimisation");
     
-    return op_pinv::apply_sym(out, A, tol, method_id);
+    const bool status = op_pinv::apply_sym(out, A, tol, method_id);
+    
+    if(status)
+      {
+      return true;
+      }
+    else
+      {
+      arma_debug_print("op_pinv: symmetric/hermitian optimisation failed");
+      
+      // fallthrough
+      }
     }
   
   return op_pinv::apply_gen(out, A, tol, method_id);
@@ -124,7 +150,7 @@ inline
 bool
 op_pinv::apply_diag(Mat<eT>& out, const Mat<eT>& A, typename get_pod_type<eT>::result tol)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   typedef typename get_pod_type<eT>::result T;
   
@@ -170,14 +196,30 @@ inline
 bool
 op_pinv::apply_sym(Mat<eT>& out, const Mat<eT>& A, typename get_pod_type<eT>::result tol, const uword method_id)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   typedef typename get_pod_type<eT>::result T;
   
   Col< T> eigval;
   Mat<eT> eigvec;
   
-  const bool status = ((method_id == uword(0)) || (method_id == uword(2))) ? auxlib::eig_sym_dc(eigval, eigvec, A) : auxlib::eig_sym(eigval, eigvec, A);
+  bool status = false;
+  
+  if( (method_id == uword(0)) || (method_id == uword(2)) )
+    {
+    const bool allow_dc = (sizeof(blas_int) >= std::size_t(8)) ? true : (A.n_rows <= uword(32000));
+    
+    if(allow_dc == false)
+      {
+      arma_warn(3, "pinv(): matrix size too large for divide-and-conquer algorithm; using standard algorithm instead");
+      }
+    
+    status = (allow_dc) ? auxlib::eig_sym_dc(eigval, eigvec, A) : auxlib::eig_sym(eigval, eigvec, A);
+    }
+  else
+    {
+    status = auxlib::eig_sym(eigval, eigvec, A);
+    }
   
   if(status == false)  { return false; }
   
@@ -227,7 +269,7 @@ inline
 bool
 op_pinv::apply_gen(Mat<eT>& out, Mat<eT>& A, typename get_pod_type<eT>::result tol, const uword method_id)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   typedef typename get_pod_type<eT>::result T;
   
@@ -241,7 +283,27 @@ op_pinv::apply_gen(Mat<eT>& out, Mat<eT>& A, typename get_pod_type<eT>::result t
   
   if(n_cols > n_rows)  { A = trans(A); }
   
-  const bool status = ((method_id == uword(0)) || (method_id == uword(2))) ? auxlib::svd_dc_econ(U, s, V, A) : auxlib::svd_econ(U, s, V, A, 'b');
+  bool status = false;
+  
+  if( (method_id == uword(0)) || (method_id == uword(2)) )
+    {
+    const uword N = (std::min)(A.n_rows, A.n_cols);
+    
+    const uword N_limit = (is_cx<eT>::yes) ? uword(20000) : uword(23000);
+    
+    const bool allow_dc = (sizeof(blas_int) >= std::size_t(8)) ? true : (N <= N_limit);
+    
+    if(allow_dc == false)
+      {
+      arma_warn(3, "pinv(): matrix size too large for divide-and-conquer algorithm; using standard algorithm instead");
+      }
+    
+    status = (allow_dc) ? auxlib::svd_dc_econ(U, s, V, A) : auxlib::svd_econ(U, s, V, A, 'b');
+    }
+  else
+    {
+    auxlib::svd_econ(U, s, V, A, 'b');
+    }
   
   if(status == false)  { return false; }
   

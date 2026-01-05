@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,7 +27,7 @@ inline
 void
 op_vectorise_col::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_vectorise_col>& in)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   op_vectorise_col::apply_direct(out, in.m);
   }
@@ -39,12 +39,12 @@ inline
 void
 op_vectorise_col::apply_direct(Mat<typename T1::elem_type>& out, const T1& expr)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   typedef typename T1::elem_type eT;
   
   // allow detection of in-place operation
-  if(is_Mat<T1>::value || (arma_config::openmp && Proxy<T1>::use_mp))
+  if(is_Mat<T1>::value)
     {
     const unwrap<T1> U(expr);
     
@@ -80,43 +80,85 @@ op_vectorise_col::apply_direct(Mat<typename T1::elem_type>& out, const T1& expr)
       }
     }
   else
+  if( (quasi_unwrap<T1>::has_orig_mem) || (is_Mat<typename Proxy<T1>::stored_type>::value) || (arma_config::openmp && Proxy<T1>::use_mp) )
     {
-    const Proxy<T1> P(expr);
+    const quasi_unwrap<T1> U(expr);
     
-    const bool is_alias = P.is_alias(out);
-    
-    if(is_Mat<typename Proxy<T1>::stored_type>::value)
+    if(U.is_alias(out))
       {
-      const quasi_unwrap<typename Proxy<T1>::stored_type> U(P.Q);
+      Mat<eT> tmp(U.M.memptr(), U.M.n_elem, 1);
       
-      if(is_alias)
-        {
-        Mat<eT> tmp(U.M.memptr(), U.M.n_elem, 1);
-        
-        out.steal_mem(tmp);
-        }
-      else
-        {
-        out.set_size(U.M.n_elem, 1);
-        
-        arrayops::copy(out.memptr(), U.M.memptr(), U.M.n_elem);
-        }
+      out.steal_mem(tmp);
       }
     else
       {
-      if(is_alias)
-        {
-        Mat<eT> tmp;
-        
-        op_vectorise_col::apply_proxy(tmp, P);
-        
-        out.steal_mem(tmp);
-        }
-      else
-        {
-        op_vectorise_col::apply_proxy(out, P);
-        }
+      out.set_size(U.M.n_elem, 1);
+      
+      arrayops::copy(out.memptr(), U.M.memptr(), U.M.n_elem);
       }
+    }
+  else
+    {
+    const Proxy<T1> P(expr);
+    
+    if(P.is_alias(out))
+      {
+      Mat<eT> tmp;
+      
+      op_vectorise_col::apply_proxy(tmp, P);
+      
+      out.steal_mem(tmp);
+      }
+    else
+      {
+      op_vectorise_col::apply_proxy(out, P);
+      }
+    }
+  }
+
+
+
+template<typename T1>
+inline
+void
+op_vectorise_col::apply(Mat_noalias<typename T1::elem_type>& out, const Op<T1,op_vectorise_col>& in)
+  {
+  arma_debug_sigprint();
+  
+  op_vectorise_col::apply_direct(out, in.m);
+  }
+
+
+
+template<typename T1>
+inline
+void
+op_vectorise_col::apply_direct(Mat_noalias<typename T1::elem_type>& out, const T1& expr)
+  {
+  arma_debug_sigprint();
+  
+  typedef typename T1::elem_type eT;
+  
+  if(is_subview<T1>::value)
+    {
+    const subview<eT>& sv = reinterpret_cast< const subview<eT>& >(expr);
+    
+    op_vectorise_col::apply_subview(out, sv);
+    }
+  else
+  if( (quasi_unwrap<T1>::has_orig_mem) || (is_Mat<typename Proxy<T1>::stored_type>::value) || (arma_config::openmp && Proxy<T1>::use_mp) )
+    {
+    const quasi_unwrap<T1> U(expr);
+    
+    out.set_size(U.M.n_elem, 1);
+    
+    arrayops::copy(out.memptr(), U.M.memptr(), U.M.n_elem);
+    }
+  else
+    {
+    const Proxy<T1> P(expr);
+    
+    op_vectorise_col::apply_proxy(out, P);
     }
   }
 
@@ -127,7 +169,7 @@ inline
 void
 op_vectorise_col::apply_subview(Mat<eT>& out, const subview<eT>& sv)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   const uword sv_n_rows = sv.n_rows;
   const uword sv_n_cols = sv.n_cols;
@@ -151,7 +193,7 @@ inline
 void
 op_vectorise_col::apply_proxy(Mat<typename T1::elem_type>& out, const Proxy<T1>& P)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   typedef typename T1::elem_type eT;
   
@@ -214,7 +256,7 @@ inline
 void
 op_vectorise_row::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_vectorise_row>& in)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   op_vectorise_row::apply_direct(out, in.m);
   }
@@ -226,7 +268,7 @@ inline
 void
 op_vectorise_row::apply_direct(Mat<typename T1::elem_type>& out, const T1& expr)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   typedef typename T1::elem_type eT;
   
@@ -253,7 +295,7 @@ inline
 void
 op_vectorise_row::apply_proxy(Mat<typename T1::elem_type>& out, const Proxy<T1>& P)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   typedef typename T1::elem_type eT;
   
@@ -308,7 +350,7 @@ inline
 void
 op_vectorise_all::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_vectorise_all>& in)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   const uword dim = in.aux_uword_a;
   
@@ -333,7 +375,7 @@ inline
 void
 op_vectorise_cube_col::apply(Mat<typename T1::elem_type>& out, const CubeToMatOp<T1, op_vectorise_cube_col>& in)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   typedef typename T1::elem_type eT;
   
@@ -343,7 +385,7 @@ op_vectorise_cube_col::apply(Mat<typename T1::elem_type>& out, const CubeToMatOp
     }
   else
     {
-    if(is_Cube<T1>::value || (arma_config::openmp && ProxyCube<T1>::use_mp))
+    if((is_Cube<T1>::value) || (is_Cube<typename ProxyCube<T1>::stored_type>::value) || (arma_config::openmp && ProxyCube<T1>::use_mp))
       {
       op_vectorise_cube_col::apply_unwrap(out, in.m);
       }
@@ -361,7 +403,7 @@ inline
 void
 op_vectorise_cube_col::apply_subview(Mat<eT>& out, const subview_cube<eT>& sv)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   const uword sv_nr = sv.n_rows;
   const uword sv_nc = sv.n_cols;
@@ -369,14 +411,30 @@ op_vectorise_cube_col::apply_subview(Mat<eT>& out, const subview_cube<eT>& sv)
   
   out.set_size(sv.n_elem, 1);
   
+  if(sv.n_elem == 0)  { return; }
+  
   eT* out_mem = out.memptr();
   
-  for(uword s=0; s < sv_ns; ++s)
-  for(uword c=0; c < sv_nc; ++c)
+  if( (sv_nr == 1) && (sv_nc == 1) && (sv.aux_slice1 == 0) )
     {
-    arrayops::copy(out_mem, sv.slice_colptr(s,c), sv_nr);
+    const uword sv_m_n_elem_slice = sv.m.n_elem_slice;
     
-    out_mem += sv_nr;
+    const eT* sv_m_ptr = &( sv.m.at(sv.aux_row1, sv.aux_col1, 0) );
+    
+    for(uword s=0; s < sv_ns; ++s)
+      {
+      out_mem[s] = (*sv_m_ptr);  sv_m_ptr += sv_m_n_elem_slice;
+      }
+    }
+  else
+    {
+    for(uword s=0; s < sv_ns; ++s)
+    for(uword c=0; c < sv_nc; ++c)
+      {
+      arrayops::copy(out_mem, sv.slice_colptr(s,c), sv_nr);
+      
+      out_mem += sv_nr;
+      }
     }
   }
 
@@ -387,7 +445,7 @@ inline
 void
 op_vectorise_cube_col::apply_unwrap(Mat<typename T1::elem_type>& out, const T1& expr)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   const unwrap_cube<T1> U(expr);
   
@@ -403,18 +461,11 @@ inline
 void
 op_vectorise_cube_col::apply_proxy(Mat<typename T1::elem_type>& out, const T1& expr)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   typedef typename T1::elem_type eT;
   
   const ProxyCube<T1> P(expr);
-  
-  if(is_Cube<typename ProxyCube<T1>::stored_type>::value)
-    {
-    op_vectorise_cube_col::apply_unwrap(out, P.Q);
-    
-    return;
-    }
   
   const uword N = P.get_n_elem();
   

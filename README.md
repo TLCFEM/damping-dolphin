@@ -19,24 +19,9 @@ Please check the following references on the background theory of the proposed d
 
 ## To Compile
 
-### Prerequisites
+A working `Qt6` installation is required.
 
-Please install [Qt 5.12 LTS](https://doc.qt.io/qt-5.12/index.html). [OpenBLAS](https://github.com/xianyi/OpenBLAS) is
-used as the linear algebra driver. The bundled build (under `lib/`) may not be optimal on your machine, replace it with
-your version if necessary.
-
-#### Linux
-
-Nothing needs to be noted.
-
-#### Windows
-
-[Qt 5.12 LTS](https://doc.qt.io/qt-5.12/index.html) works with `GCC 8.1.0`. If it is not installed, you can either use
-the distribution by [WinLibs](https://winlibs.com/) (recommended)
-or [MinGW-w64](https://sourceforge.net/projects/mingw-w64/files/).
-
-Alternatively, download and install [Visual Studio 2019](https://visualstudio.microsoft.com/vs/older-downloads/) if you
-wish to use MSVC platform.
+Set `QT_PATH` to the proper `lib/cmake` folder of the taget Qt installation if CMake cannot find it automatically.
 
 ## Dependencies
 

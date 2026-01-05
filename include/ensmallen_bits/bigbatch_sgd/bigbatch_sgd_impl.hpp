@@ -50,8 +50,8 @@ template<typename SeparableFunctionType,
          typename MatType,
          typename GradType,
          typename... CallbackTypes>
-typename std::enable_if<IsArmaType<GradType>::value,
-typename MatType::elem_type>::type
+typename std::enable_if<IsMatrixType<GradType>::value,
+    typename MatType::elem_type>::type
 BigBatchSGD<UpdatePolicyType>::Optimize(
     SeparableFunctionType& function,
     MatType& iterateIn,
@@ -104,7 +104,7 @@ BigBatchSGD<UpdatePolicyType>::Optimize(
   BaseGradType functionGradient(iterate.n_rows, iterate.n_cols);
   const size_t actualMaxIterations = (maxIterations == 0) ?
       std::numeric_limits<size_t>::max() : maxIterations;
-  terminate |= Callback::BeginOptimization(*this, f, iterate, callbacks...);
+  Callback::BeginOptimization(*this, f, iterate, callbacks...);
   for (size_t i = 0; i < actualMaxIterations && !terminate;
       /* incrementing done manually */)
   {
@@ -137,13 +137,13 @@ BigBatchSGD<UpdatePolicyType>::Optimize(
       delta0 = delta1 + (functionGradient - delta1) / k;
 
       // Compute sample variance.
-      vB += arma::norm(functionGradient - delta1, 2.0) *
-          arma::norm(functionGradient - delta0, 2.0);
+      vB += norm(functionGradient - delta1, 2.0) *
+          norm(functionGradient - delta0, 2.0);
 
       delta1 = delta0;
       gradient += functionGradient;
     }
-    double gB = std::pow(arma::norm(gradient / effectiveBatchSize, 2), 2.0);
+    double gB = std::pow(norm(gradient / effectiveBatchSize, 2), 2.0);
 
     // Reset the batch size update process counter.
     reset = false;
@@ -174,13 +174,13 @@ BigBatchSGD<UpdatePolicyType>::Optimize(
           delta0 = delta1 + (functionGradient - delta1) / (k + 1);
 
           // Compute sample variance.
-          vB += arma::norm(functionGradient - delta1, 2.0) *
-              arma::norm(functionGradient - delta0, 2.0);
+          vB += norm(functionGradient - delta1, 2.0) *
+              norm(functionGradient - delta0, 2.0);
 
           delta1 = delta0;
           gradient += functionGradient;
         }
-        gB = std::pow(arma::norm(gradient / (batchSize + batchOffset), 2), 2.0);
+        gB = std::pow(norm(gradient / (batchSize + batchOffset), 2), 2.0);
 
         // Update the batchSize.
         batchSize += batchOffset;
@@ -191,12 +191,15 @@ BigBatchSGD<UpdatePolicyType>::Optimize(
       }
     }
 
+    if (terminate)
+      break;
+
     instUpdatePolicy.As<InstUpdatePolicyType>().Update(f, stepSize, iterate,
         gradient, gB, vB, currentFunction, batchSize, effectiveBatchSize,
         reset);
 
     // Update the iterate.
-    iterate -= stepSize * gradient;
+    iterate -= ElemType(stepSize) * gradient;
     terminate |= Callback::StepTaken(*this, f, iterate, callbacks...);
 
     const ElemType objective = f.Evaluate(iterate, currentFunction,
@@ -229,9 +232,7 @@ BigBatchSGD<UpdatePolicyType>::Optimize(
         return overallObjective;
       }
 
-      if (std::abs(lastObjective - overallObjective) < tolerance ||
-          Callback::BeginEpoch(*this, f, iterate, epoch, overallObjective,
-              callbacks...))
+      if (std::abs(lastObjective - overallObjective) < tolerance)
       {
         Info << "Big-batch SGD: minimized within tolerance " << tolerance
             << "; terminating optimization." << std::endl;
@@ -240,18 +241,27 @@ BigBatchSGD<UpdatePolicyType>::Optimize(
         return overallObjective;
       }
 
-      // Reset the counter variables.
-      lastObjective = overallObjective;
-      overallObjective = 0;
-      currentFunction = 0;
+      terminate |= Callback::BeginEpoch(*this, f, iterate, epoch,
+          overallObjective, callbacks...);
+
+      // Reset the counter variables if we will continue.
+      if (i != actualMaxIterations)
+      {
+        lastObjective = overallObjective;
+        overallObjective = 0;
+        currentFunction = 0;
+      }
 
       if (shuffle) // Determine order of visitation.
         f.Shuffle();
     }
   }
 
-  Info << "Big-batch SGD: maximum iterations (" << maxIterations << ") "
-      << "reached; terminating optimization." << std::endl;
+  if (!terminate)
+  {
+    Info << "Big-batch SGD: maximum iterations (" << maxIterations << ") "
+        << "reached; terminating optimization." << std::endl;
+  }
 
   // Calculate final objective if exactObjective is set to true.
   if (exactObjective)
@@ -263,7 +273,9 @@ BigBatchSGD<UpdatePolicyType>::Optimize(
       const ElemType objective = f.Evaluate(iterate, i, effectiveBatchSize);
       overallObjective += objective;
 
-      Callback::Evaluate(*this, f, iterate, objective, callbacks...);
+      // The optimization is finished, so we don't need to care what the
+      // callback returns.
+      (void) Callback::Evaluate(*this, f, iterate, objective, callbacks...);
     }
   }
 

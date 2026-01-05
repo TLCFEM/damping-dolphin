@@ -36,16 +36,19 @@ namespace ens {
 template<typename VelocityUpdatePolicy,
          typename InitPolicy>
 template<typename ArbitraryFunctionType,
-         typename MatType,
+         typename InputMatType,
          typename... CallbackTypes>
-typename MatType::elem_type PSOType<VelocityUpdatePolicy, InitPolicy>::Optimize(
+typename InputMatType::elem_type PSOType<
+    VelocityUpdatePolicy, InitPolicy>::Optimize(
     ArbitraryFunctionType& function,
-    MatType& iterateIn,
+    InputMatType& iterateIn,
     CallbackTypes&&... callbacks)
 {
   // Convenience typedefs.
-  typedef typename MatType::elem_type ElemType;
-  typedef typename MatTypeTraits<MatType>::BaseMatType BaseMatType;
+  typedef typename InputMatType::elem_type ElemType;
+  typedef typename ForwardType<InputMatType>::bmat BaseMatType;
+  typedef typename ForwardType<InputMatType>::bcol BaseColType;
+  typedef typename ForwardType<InputMatType>::bcube BaseCubeType;
 
   // The update policy internally use a templated class so that
   // we can know MatType only when Optimize() is called.
@@ -56,6 +59,15 @@ typename MatType::elem_type PSOType<VelocityUpdatePolicy, InitPolicy>::Optimize(
   traits::CheckArbitraryFunctionTypeAPI<ArbitraryFunctionType,
       BaseMatType>();
   RequireDenseFloatingPointType<BaseMatType>();
+
+  // The number of iterations must be greater than the horizon size.
+  if (maxIterations < horizonSize)
+  {
+    std::ostringstream oss;
+    oss << "PSO::Optimize(): maxIterations (" << maxIterations << ") must be "
+        << "greater than or equal to horizonSize (" << horizonSize << ")!";
+    throw std::runtime_error(oss.str());
+  }
 
   BaseMatType& iterate = (BaseMatType&) iterateIn;
 
@@ -70,17 +82,18 @@ typename MatType::elem_type PSOType<VelocityUpdatePolicy, InitPolicy>::Optimize(
   }
 
   // Initialize helper variables.
-  arma::Cube<ElemType> particlePositions;
-  arma::Cube<ElemType> particleVelocities;
-  arma::Col<ElemType> particleFitnesses;
-  arma::Col<ElemType> particleBestFitnesses;
-  arma::Cube<ElemType> particleBestPositions;
+  BaseCubeType particlePositions, particleVelocities, particleBestPositions;
+  BaseColType particleFitnesses, particleBestFitnesses;
+
+  //! Useful temporaries for float-like comparisons.
+  BaseMatType castedlowerBound = conv_to<BaseMatType>::from(lowerBound);
+  BaseMatType castedupperBound = conv_to<BaseMatType>::from(upperBound);
 
   // Initialize particles using the init policy.
   initPolicy.Initialize(iterate,
       numParticles,
-      lowerBound,
-      upperBound,
+      castedlowerBound,
+      castedupperBound,
       particlePositions,
       particleVelocities,
       particleFitnesses,
@@ -91,14 +104,15 @@ typename MatType::elem_type PSOType<VelocityUpdatePolicy, InitPolicy>::Optimize(
   instUpdatePolicy.As<InstUpdatePolicyType>().Initialize(exploitationFactor,
       explorationFactor, numParticles, iterate);
 
-  terminate |= Callback::BeginOptimization(*this, function, iterate,
-      callbacks...);
+  Callback::BeginOptimization(*this, function, iterate, callbacks...);
 
   // Calculate initial fitness of population.
-  for (size_t i = 0; i < numParticles; i++)
+  for (size_t i = 0; (i < numParticles) && !terminate; i++)
   {
     // Calculate fitness value.
     particleFitnesses(i) = function.Evaluate(particlePositions.slice(i));
+    terminate |= Callback::Evaluate(*this, function,
+        particlePositions.slice(i), particleFitnesses(i), callbacks...);
     particleBestFitnesses(i) = particleFitnesses(i);
   }
 
@@ -115,14 +129,17 @@ typename MatType::elem_type PSOType<VelocityUpdatePolicy, InitPolicy>::Optimize(
   // in the PSO method.
   // The performanceHorizon will be updated with the best particle
   // in a FIFO manner.
-  for (size_t i = 0; i < horizonSize; i++)
+  size_t iteration = 0;
+  for (size_t i = 0; (i < horizonSize) && !terminate; i++, iteration++)
   {
     // Calculate fitness and evaluate personal best.
-    for (size_t j = 0; j < numParticles; j++)
+    for (size_t j = 0; (j < numParticles) && !terminate; j++)
     {
       particleFitnesses(j) = function.Evaluate(particlePositions.slice(j));
-      Callback::Evaluate(*this, function, particlePositions.slice(j),
-          particleFitnesses(j), callbacks...);
+      terminate |= Callback::Evaluate(*this, function,
+          particlePositions.slice(j), particleFitnesses(j), callbacks...);
+      if (terminate)
+        break;
 
       // Compare and copy fitness and position to particle best.
       if (particleFitnesses(j) < particleBestFitnesses(j))
@@ -155,22 +172,32 @@ typename MatType::elem_type PSOType<VelocityUpdatePolicy, InitPolicy>::Optimize(
 
     // Append bestFitness to performanceHorizon.
     performanceHorizon.push(bestFitness);
+
+    Info << "PSO: iteration " << iteration << ": objective " << bestFitness
+        << "." << std::endl;
   }
 
   // Run the remaining iterations of PSO.
-  for (size_t i = 0; i < maxIterations - horizonSize; i++)
+  for (size_t i = 0; (i < maxIterations - horizonSize) && !terminate; i++,
+       iteration++)
   {
     // Check if there is any improvement over the horizon.
     // If there is no significant improvement, terminate.
     if (performanceHorizon.front() - performanceHorizon.back() < impTolerance)
+    {
+      Info << "PSO: improvement over horizon ("
+          << (performanceHorizon.front() - performanceHorizon.back())
+          << ") below convergence tolerance (" << impTolerance
+          << "); optimization complete." << std::endl;
       break;
+    }
 
     // Calculate fitness and evaluate personal best.
-    for (size_t j = 0; j < numParticles; j++)
+    for (size_t j = 0; (j < numParticles) && !terminate; j++)
     {
       particleFitnesses(j) = function.Evaluate(particlePositions.slice(j));
-      Callback::Evaluate(*this, function, particlePositions.slice(j),
-          particleFitnesses(j), callbacks...);
+      terminate |= Callback::Evaluate(*this, function,
+          particlePositions.slice(j), particleFitnesses(j), callbacks...);
 
       // Compare and copy fitness and position to particle best.
       if (particleFitnesses(j) < particleBestFitnesses(j))
@@ -205,6 +232,9 @@ typename MatType::elem_type PSOType<VelocityUpdatePolicy, InitPolicy>::Optimize(
     performanceHorizon.pop();
     // Push most recent bestFitness to performanceHorizon.
     performanceHorizon.push(bestFitness);
+
+    Info << "PSO: iteration " << iteration << ": objective " << bestFitness
+        << "." << std::endl;
   }
 
   // Copy results back.
