@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022-2023 Theodore Chang
+ * Copyright (C) 2022-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,8 +71,8 @@ private:
     void addType(const QString&);
     void addType(const QStringList&);
     void addControlPointToPlot();
-    void updateScale();
-    bool validateScheme();
+    void updateScale() const;
+    bool validateScheme() const;
 private slots:
     void addControlPoint();
     void addType();
@@ -86,7 +86,7 @@ private slots:
     void savePlot();
     void saveTypeInfo();
     void scatterControlPoint();
-    void updateParameterFields(int);
+    void updateParameterFields(int) const;
     void updateTypeList();
     void switchCurveScale();
     void changeX();
@@ -94,10 +94,10 @@ private slots:
     void performFitting();
     void performFittingTask(const arma::mat&);
     void loadControlPoint();
-    void updateOptimizerModeList();
+    void updateOptimizerModeList() const;
     void processFittingResult(QStringList);
     void switchTheme();
-    void changeLegend();
+    void changeLegend() const;
     void showGuidelines();
     void showFitSetting();
     void tidyUp();

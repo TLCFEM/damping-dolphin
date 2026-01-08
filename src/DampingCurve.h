@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022-2023 Theodore Chang
+ * Copyright (C) 2022-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,14 +33,14 @@ public:
     const QVector<double>& getFrequencyVector();
     const QVector<double>& getDampingRatioVector();
 
-    double minFrequency();
-    double maxFrequency();
-    double minDampingRatio();
-    double maxDampingRatio();
+    [[nodiscard]] double minFrequency() const;
+    [[nodiscard]] double maxFrequency() const;
+    [[nodiscard]] double minDampingRatio() const;
+    [[nodiscard]] double maxDampingRatio() const;
 
     mat getSampling();
 
-    int count();
+    [[nodiscard]] long int count() const;
 };
 
 class DampingCurve {
@@ -66,10 +66,10 @@ public:
 
     QStringList getTypeInfo();
     QStringList getCommand();
-    int count();
+    [[nodiscard]] long int count() const;
 
-    double minFrequency();
-    double maxFrequency();
+    [[nodiscard]] double minFrequency() const;
+    [[nodiscard]] double maxFrequency() const;
     double minDampingRatio();
     double maxDampingRatio();
 

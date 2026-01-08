@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022-2023 Theodore Chang
+ * Copyright (C) 2022-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,9 @@
 
 #include <QApplication>
 #include <QFile>
-#include <QFontDatabase>
-#include <QStyle>
 #include "MainWindow.h"
 
 int main(int argc, char* argv[]) {
-    if(qVersion()[0] == '5') QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
     QApplication app(argc, argv);
     QApplication::setApplicationName("Damping Dolphin");
     QApplication::setApplicationDisplayName("Damping Dolphin");

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022-2023 Theodore Chang
+ * Copyright (C) 2022-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ double DampingModeT1::operator()(const double in_omega) const {
     const auto omega_r = abs(in_omega / omega_p);
     const auto n0 = 2. * l * omega_r / (l * omega_r * omega_r + 1.);
     auto n1 = pow(n0, 2. * p[0] + 1.);
-    if(l < 0. && unsigned(p[0]) % 2 != 0)
+    if(l < 0. && static_cast<unsigned>(p[0]) % 2 != 0)
         n1 = -n1;
 
     return zeta_p * n1;
@@ -62,7 +62,7 @@ QString DampingModeT1::str() const {
 }
 
 QString DampingModeT1::command() const {
-    return "-type1 " + QString::number(zeta_p, 'e', 5) + " " + QString::number(omega_p, 'e', 5) + " " + QString::number(int(p[0]));
+    return "-type1 " + QString::number(zeta_p, 'e', 5) + " " + QString::number(omega_p, 'e', 5) + " " + QString::number(static_cast<int>(p[0]));
 }
 
 DampingModeT2::DampingModeT2(const double in_omega, const double in_zeta, std::vector<double>&& in_p)
@@ -80,9 +80,9 @@ double DampingModeT2::operator()(const double in_omega) const {
     auto b = pow(omega_r, 2. * nps);
 
     if(l < 0.) {
-        if(unsigned(npl) % 2 == 0)
+        if(static_cast<unsigned>(npl) % 2 == 0)
             a = -a;
-        if(unsigned(nps) % 2 != 0)
+        if(static_cast<unsigned>(nps) % 2 != 0)
             b = -b;
     }
 
@@ -99,7 +99,7 @@ QString DampingModeT2::str() const {
 }
 
 QString DampingModeT2::command() const {
-    return "-type2 " + QString::number(zeta_p, 'e', 5) + " " + QString::number(omega_p, 'e', 5) + " " + QString::number(int(p[0])) + " " + QString::number(int(p[1]));
+    return "-type2 " + QString::number(zeta_p, 'e', 5) + " " + QString::number(omega_p, 'e', 5) + " " + QString::number(static_cast<int>(p[0])) + " " + QString::number(static_cast<int>(p[1]));
 }
 
 DampingModeT3::DampingModeT3(const double in_omega, const double in_zeta, std::vector<double>&& in_p)
@@ -141,9 +141,9 @@ double DampingModeT4::operator()(const double in_omega) const {
     auto b = pow(omega_r, 2. * nps);
 
     if(l < 0.) {
-        if(unsigned(npl) % 2 == 0)
+        if(static_cast<unsigned>(npl) % 2 == 0)
             a = -a;
-        if(unsigned(nps) % 2 != 0)
+        if(static_cast<unsigned>(nps) % 2 != 0)
             b = -b;
     }
 
@@ -156,9 +156,9 @@ double DampingModeT4::operator()(const double in_omega) const {
     b = pow(omega_r, 2. * npt);
 
     if(l < 0.) {
-        if(unsigned(npm) % 2 == 0)
+        if(static_cast<unsigned>(npm) % 2 == 0)
             a = -a;
-        if(unsigned(npt) % 2 != 0)
+        if(static_cast<unsigned>(npt) % 2 != 0)
             b = -b;
     }
 
@@ -179,5 +179,5 @@ QString DampingModeT4::str() const {
 }
 
 QString DampingModeT4::command() const {
-    return "-type4 " + QString::number(zeta_p, 'e', 5) + " " + QString::number(omega_p, 'e', 5) + " " + QString::number(int(p[0])) + " " + QString::number(int(p[1])) + " " + QString::number(int(p[2])) + " " + QString::number(int(p[3])) + " " + QString::number(p[4], 'e', 8);
+    return "-type4 " + QString::number(zeta_p, 'e', 5) + " " + QString::number(omega_p, 'e', 5) + " " + QString::number(static_cast<int>(p[0])) + " " + QString::number(static_cast<int>(p[1])) + " " + QString::number(static_cast<int>(p[2])) + " " + QString::number(static_cast<int>(p[3])) + " " + QString::number(p[4], 'e', 8);
 }
