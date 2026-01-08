@@ -1,6 +1,6 @@
 QT += core gui widgets printsupport
 
-CONFIG += c++14
+CONFIG += c++20
 
 RC_ICONS = res/dolphin.ico
 
