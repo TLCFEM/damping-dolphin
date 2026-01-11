@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022-2023 Theodore Chang
+ * Copyright (C) 2022-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,11 +42,11 @@ template<typename T> void MaxIterations(T& optimizer, const int maxIter) {
     optimizer.MaxIterations() = maxIter;
 }
 
-template<> void NumBasis(L_BFGS& T, const int num_basis) { T.NumBasis() = num_basis; }
-template<> void StepSize(L_BFGS&, double) {}
-template<> void Tolerance(L_BFGS&, double) {}
-template<> void StepSize(AugLagrangian&, double) {}
-template<> void Tolerance(AugLagrangian&, double) {}
+template<> inline void NumBasis(L_BFGS& T, const int num_basis) { T.NumBasis() = num_basis; }
+template<> inline void StepSize(L_BFGS&, double) {}
+template<> inline void Tolerance(L_BFGS&, double) {}
+template<> inline void StepSize(AugLagrangian&, double) {}
+template<> inline void Tolerance(AugLagrangian&, double) {}
 
 template<typename MatType>
 class EarlyQuit {

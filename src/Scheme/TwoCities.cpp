@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022-2023 Theodore Chang
+ * Copyright (C) 2022-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ double TwoCities::compute_response(const double x, const vec& p) {
     return z * (1. + r) * pow(xr, 2. * nl + 1.) / (1. + r * pow(xr, 2. * (1. + nr + nl)));
 }
 
-vec TwoCities::compute_gradient(double x, const vec& p) {
+vec TwoCities::compute_gradient(const double x, const vec& p) {
     vec out(num_para + 1);
 
     const auto& w = p(0);
@@ -119,8 +119,7 @@ double TwoCities::EvaluateWithGradient(const mat& x, mat& g) {
         dd::parallel_for(0llu, sampling.n_cols, [&](const uword I) {
             const auto grad = compute_gradient(sampling(0, I), sp);
             response(J, I) = grad(0);
-            vec gi(&dg(num_para * J, I), num_para, false, true);
-            gi = grad.tail(num_para) % dsp;
+            vec(&dg(num_para * J, I), num_para, false, true) = grad.tail(num_para) % dsp;
         });
     }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022-2023 Theodore Chang
+ * Copyright (C) 2022-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ void DampingCurve::updateLinearDampingCurve(const double start, const double end
     const auto gap = end - start;
 
     for(int i = 0; i < static_cast<int>(samples); ++i) {
-        omega[i] = double(i) / (static_cast<double>(samples) - 1.) * gap + start;
+        omega[i] = static_cast<double>(i) / (static_cast<double>(samples) - 1.) * gap + start;
         zeta_sum[i] = 0.;
     }
 
@@ -73,7 +73,7 @@ void DampingCurve::updateLogarithmicDampingCurve(double start, double end, const
     const auto gap = end - start;
 
     for(int i = 0; i < static_cast<int>(samples); ++i) {
-        omega[i] = pow(10., double(i) / (static_cast<double>(samples) - 1.) * gap + start);
+        omega[i] = pow(10., static_cast<double>(i) / (static_cast<double>(samples) - 1.) * gap + start);
         zeta_sum[i] = 0.;
     }
 
@@ -117,15 +117,15 @@ QStringList DampingCurve::getCommand() {
     return command_list;
 }
 
-int DampingCurve::count() {
+long int DampingCurve::count() const {
     return damping_modes.size();
 }
 
-double DampingCurve::minFrequency() {
+double DampingCurve::minFrequency() const {
     return *std::min_element(omega.cbegin(), omega.cend());
 }
 
-double DampingCurve::maxFrequency() {
+double DampingCurve::maxFrequency() const {
     return *std::max_element(omega.cbegin(), omega.cend());
 }
 
@@ -180,19 +180,19 @@ const QVector<double>& ControlPoint::getDampingRatioVector() {
     return zeta;
 }
 
-double ControlPoint::minFrequency() {
+double ControlPoint::minFrequency() const {
     return *std::min_element(omega.cbegin(), omega.cend());
 }
 
-double ControlPoint::maxFrequency() {
+double ControlPoint::maxFrequency() const {
     return *std::max_element(omega.cbegin(), omega.cend());
 }
 
-double ControlPoint::minDampingRatio() {
+double ControlPoint::minDampingRatio() const {
     return *std::min_element(zeta.cbegin(), zeta.cend());
 }
 
-double ControlPoint::maxDampingRatio() {
+double ControlPoint::maxDampingRatio() const {
     return *std::max_element(zeta.cbegin(), zeta.cend());
 }
 
@@ -209,6 +209,6 @@ mat ControlPoint::getSampling() {
     return sampling.rows(ordering);
 }
 
-int ControlPoint::count() {
+long int ControlPoint::count() const {
     return omega.size();
 }

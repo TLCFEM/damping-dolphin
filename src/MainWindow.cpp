@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022-2023 Theodore Chang
+ * Copyright (C) 2022-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
  ******************************************************************************/
 
 #include "MainWindow.h"
+
+#include <ranges>
 #include "About.h"
 #include "DampingMode.h"
 #include "Scheme/Scheme"
@@ -28,7 +30,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     table->setHorizontalHeaderLabels(QStringList({QString{"Frequency"}, QString{"Damping Ratio"}}));
 
-    ui->omega->setMaximum(std::numeric_limits<double>().max());
+    ui->omega->setMaximum(std::numeric_limits<double>::max());
 
     ui->controlPointTable->setModel(table);
     ui->controlPointTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -62,10 +64,9 @@ MainWindow::~MainWindow() {
 void MainWindow::savePlot() {
     const auto width = ui->imageWidth->value();
     const auto height = ui->imageHeight->value();
-    const auto type = ui->imageType->currentIndex();
 
-    if(0 == type) {
-        QString name = QFileDialog::getSaveFileName(this, tr("Save"), "", tr("*.pdf"));
+    if(const auto type = ui->imageType->currentIndex(); 0 == type) {
+        const QString name = QFileDialog::getSaveFileName(this, tr("Save"), "", tr("*.pdf"));
 
         if(name.isEmpty())
             return;
@@ -73,7 +74,7 @@ void MainWindow::savePlot() {
         ui->canvas->savePdf(name, width, height);
     }
     else if(1 == type) {
-        QString name = QFileDialog::getSaveFileName(this, tr("Save"), "", tr("*.png"));
+        const QString name = QFileDialog::getSaveFileName(this, tr("Save"), "", tr("*.png"));
 
         if(name.isEmpty())
             return;
@@ -81,7 +82,7 @@ void MainWindow::savePlot() {
         ui->canvas->savePng(name, width, height);
     }
     else if(2 == type) {
-        QString name = QFileDialog::getSaveFileName(this, tr("Save"), "", tr("*.jpg"));
+        const QString name = QFileDialog::getSaveFileName(this, tr("Save"), "", tr("*.jpg"));
 
         if(name.isEmpty())
             return;
@@ -93,7 +94,7 @@ void MainWindow::savePlot() {
 }
 
 void MainWindow::saveTypeInfo() {
-    QString name = QFileDialog::getSaveFileName(this, tr("Save"), "", tr("All Files (*)"));
+    const QString name = QFileDialog::getSaveFileName(this, tr("Save"), "", tr("All Files (*)"));
 
     if(name.isEmpty())
         return;
@@ -104,9 +105,7 @@ void MainWindow::saveTypeInfo() {
         return;
     }
 
-    const auto type_info = damping_curve.getTypeInfo();
-
-    for(const auto& I : qAsConst(type_info)) {
+    for(const auto type_info = damping_curve.getTypeInfo(); const auto& I : std::as_const(type_info)) {
         file.write(I.toStdString().c_str());
         file.write("\n");
     }
@@ -115,7 +114,7 @@ void MainWindow::saveTypeInfo() {
 }
 
 void MainWindow::loadTypeInfo() {
-    QString name = QFileDialog::getOpenFileName(this, tr("Load"), "", tr("All Files (*)"));
+    const QString name = QFileDialog::getOpenFileName(this, tr("Load"), "", tr("All Files (*)"));
 
     if(name.isEmpty())
         return;
@@ -132,7 +131,7 @@ void MainWindow::loadTypeInfo() {
     statusBar()->showMessage("Successfully read from file.");
 }
 
-void MainWindow::updateParameterFields(int index) {
+void MainWindow::updateParameterFields(const int index) const {
     ui->paLabel->setText("");
     ui->pbLabel->setText("");
     ui->pcLabel->setText("");
@@ -252,9 +251,9 @@ void MainWindow::addType() {
 void MainWindow::removeSelectedType() {
     auto highlighted = ui->currentTypes->selectionModel()->selectedIndexes();
 
-    std::sort(highlighted.begin(), highlighted.end(), std::less<QModelIndex>());
-    for(auto I = highlighted.rbegin(); I != highlighted.rend(); ++I)
-        damping_curve.removeMode(I->row());
+    std::sort(highlighted.begin(), highlighted.end(), std::less<>());
+    for(auto& I : std::ranges::reverse_view(highlighted))
+        damping_curve.removeMode(I.row());
 
     updateTypeList();
 }
@@ -397,9 +396,9 @@ void MainWindow::addControlPoint() {
 }
 
 void MainWindow::removeSelectedControlPoint() {
-    QModelIndexList indexes = ui->controlPointTable->selectionModel()->selectedRows();
+    const QModelIndexList indexes = ui->controlPointTable->selectionModel()->selectedRows();
 
-    for(int i = indexes.count(); i > 0; i--) {
+    for(long int i = indexes.count(); i > 0; i--) {
         const auto row_number = indexes.at(i - 1).row();
         table->removeRow(row_number);
         control_point.removePoint(row_number);
@@ -451,8 +450,7 @@ void MainWindow::performFitting() {
 
         if(optimization_task.wait_for(0ms) != std::future_status::ready) {
             statusBar()->showMessage("The previous optimization is still running.");
-            const int ret = QMessageBox::question(this, tr("Task is running."), tr("The optimization task is running, click OK to wait, or Abort to cancel"), QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Abort));
-            if(QMessageBox::Abort == ret)
+            if(const int ret = QMessageBox::question(this, tr("Task is running."), tr("The optimization task is running, click OK to wait, or Abort to cancel"), QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Abort)); QMessageBox::Abort == ret)
                 early_quit = true;
             return;
         }
@@ -530,7 +528,7 @@ void MainWindow::performFittingTask(const mat& reference) {
 }
 
 void MainWindow::loadControlPoint() {
-    QString name = QFileDialog::getOpenFileName(this, tr("Load"), "", tr("All Files (*)"));
+    const QString name = QFileDialog::getOpenFileName(this, tr("Load"), "", tr("All Files (*)"));
 
     if(name.isEmpty())
         return;
@@ -541,7 +539,7 @@ void MainWindow::loadControlPoint() {
     clearAllControlPoints();
 
     for(auto I = 0llu; I < cp.n_rows; ++I) {
-        table->insertRow(table->rowCount(), QList<QStandardItem*>({new QStandardItem(QString::number(cp(I, 0))), new QStandardItem(QString::number(cp(I, 1)))}));
+        table->insertRow(table->rowCount(), QList({new QStandardItem(QString::number(cp(I, 0))), new QStandardItem(QString::number(cp(I, 1)))}));
 
         control_point.addPoint(cp(I, 0), cp(I, 1));
     }
@@ -551,7 +549,7 @@ void MainWindow::loadControlPoint() {
     statusBar()->showMessage("Successfully read from file.");
 }
 
-void MainWindow::updateOptimizerModeList() {
+void MainWindow::updateOptimizerModeList() const {
     ui->numberT0->setDisabled(true);
     ui->numberT1->setDisabled(true);
     ui->numberT2->setDisabled(true);
@@ -586,7 +584,7 @@ void MainWindow::switchTheme() {
         setStyleSheet("");
 }
 
-void MainWindow::changeLegend() {
+void MainWindow::changeLegend() const {
     if(ui->changeLegend->checkState() == Qt::Checked)
         ui->canvas->legend->setVisible(true);
     else
@@ -611,9 +609,7 @@ void MainWindow::tidyUp() {
 void MainWindow::commandSP() {
     QString command = "integrator LeeNewmarkFull 1 .25 .5";
 
-    const auto command_list = damping_curve.getCommand();
-
-    for(const auto& I : qAsConst(command_list)) {
+    for(const auto command_list = damping_curve.getCommand(); const auto& I : std::as_const(command_list)) {
         command += ' ';
         command += I;
     }
@@ -624,9 +620,7 @@ void MainWindow::commandSP() {
 void MainWindow::commandOS() {
     QString command = "integrator LeeNewmarkFullKC .5 .25";
 
-    const auto command_list = damping_curve.getCommand();
-
-    for(const auto& I : qAsConst(command_list)) {
+    for(const auto command_list = damping_curve.getCommand(); const auto& I : std::as_const(command_list)) {
         command += ' ';
         command += I;
     }
@@ -704,7 +698,7 @@ void MainWindow::addControlPointToPlot() {
     ui->canvas->replot();
 }
 
-void MainWindow::updateScale() {
+void MainWindow::updateScale() const {
     if(ui->switchCurveScale->checkState() == Qt::Unchecked) {
         ui->canvas->xAxis->setScaleType(QCPAxis::stLinear);
         ui->canvas->xAxis->setTicker(QSharedPointer<QCPAxisTicker>(new QCPAxisTicker));
@@ -719,10 +713,8 @@ void MainWindow::updateScale() {
     }
 }
 
-bool MainWindow::validateScheme() {
-    const auto min_x = ui->minX->text().toDouble();
-
-    if(min_x > 0.) return true;
+bool MainWindow::validateScheme() const {
+    if(const auto min_x = ui->minX->text().toDouble(); min_x > 0.) return true;
 
     if(ui->optimizationScheme->currentText() == "Zero Day") return false;
     if(ui->optimizationScheme->currentText() == "Unicorn") return false;

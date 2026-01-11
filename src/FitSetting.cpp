@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022-2023 Theodore Chang
+ * Copyright (C) 2022-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ FitSetting::~FitSetting() {
     delete ui;
 }
 
-Ui::FitSetting* FitSetting::getUi() {
+Ui::FitSetting* FitSetting::getUi() const {
     return ui;
 }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022-2023 Theodore Chang
+ * Copyright (C) 2022-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -88,8 +88,7 @@ double ThreeWiseMen::EvaluateWithGradient(const mat& x, mat& g) {
         dd::parallel_for(0llu, sampling.n_cols, [&](const uword I) {
             const auto grad = compute_gradient(sampling(0, I), sp);
             response(J, I) = grad(0);
-            vec gi(&dg(num_para * J, I), num_para, false, true);
-            gi = grad.tail(num_para) % dsp;
+            vec(&dg(num_para * J, I), num_para, false, true) = grad.tail(num_para) % dsp;
         });
     }
 
