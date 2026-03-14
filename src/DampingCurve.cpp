@@ -181,19 +181,19 @@ const QVector<double>& ControlPoint::getDampingRatioVector() {
 }
 
 double ControlPoint::minFrequency() const {
-    return *std::min_element(omega.cbegin(), omega.cend());
+    return omega.isEmpty() ? 1 : *std::min_element(omega.cbegin(), omega.cend());
 }
 
 double ControlPoint::maxFrequency() const {
-    return *std::max_element(omega.cbegin(), omega.cend());
+    return omega.isEmpty() ? 1 : *std::max_element(omega.cbegin(), omega.cend());
 }
 
 double ControlPoint::minDampingRatio() const {
-    return *std::min_element(zeta.cbegin(), zeta.cend());
+    return zeta.isEmpty() ? 0. : *std::min_element(zeta.cbegin(), zeta.cend());
 }
 
 double ControlPoint::maxDampingRatio() const {
-    return *std::max_element(zeta.cbegin(), zeta.cend());
+    return zeta.isEmpty() ? 1. : *std::max_element(zeta.cbegin(), zeta.cend());
 }
 
 mat ControlPoint::getSampling() {
