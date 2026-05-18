@@ -81,7 +81,7 @@ template<typename T> mat run_optimizer(const OptimizerSetting& opt_setting, Obje
 
     mat x = 2. * randn(f->getSize() * f->getNumberModes());
 
-    optimizer.Optimize(*f, x, Report(0.1), PrintLoss(), EarlyQuit<arma::mat>(quit));
+    optimizer.Optimize(*f, x, Report(0.1), PrintLoss(), EarlyQuit<decltype(x)>(quit));
 
     return reshape(x, f->getSize(), f->getNumberModes()).eval().each_col([&](vec& a) { a = f->s(a); }).t();
 }
