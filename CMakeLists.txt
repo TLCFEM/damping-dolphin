@@ -66,18 +66,10 @@ set(RESOURCES
         res/res.qrc
 )
 
-add_executable(${PROJECT_NAME} ${UIS} ${SOURCES} ${RESOURCES})
-
-target_link_libraries(${PROJECT_NAME}
-        Qt6::Core
-        Qt6::Gui
-        Qt6::Widgets
-        Qt6::PrintSupport
-        openblas
-)
+link_libraries(Qt6::Core Qt6::Gui Qt6::Widgets Qt6::PrintSupport openblas)
 
 if (UNIX)
-    target_link_libraries(${PROJECT_NAME} gfortran quadmath gomp pthread)
+    link_libraries(gfortran quadmath gomp pthread)
 
     if (DD_USE_TBB)
         add_compile_definitions(DD_TBB_ENABLED)
@@ -88,6 +80,9 @@ if (UNIX)
 
         include_directories(oneTBB/include)
 
-        target_link_libraries(${PROJECT_NAME} TBB::tbb TBB::tbbmalloc TBB::tbbmalloc_proxy)
+        link_libraries(TBB::tbb TBB::tbbmalloc TBB::tbbmalloc_proxy)
     endif ()
 endif ()
+
+add_executable(${PROJECT_NAME} ${UIS} ${SOURCES} ${RESOURCES})
+add_executable(scratch src/Scratch.cpp)
