@@ -25,7 +25,7 @@ ObjectiveFunction::ObjectiveFunction(const unsigned S)
     : num_modes(S) {}
 
 void ObjectiveFunction::initializeSampling(mat&& T) {
-    sampling = std::forward<mat>(T);
+    sampling = std::move(T);
     response.set_size(num_modes, sampling.n_cols);
     min_omega = log10(min(sampling.row(0))) - .1;
     max_omega = log10(max(sampling.row(0))) + .1;
