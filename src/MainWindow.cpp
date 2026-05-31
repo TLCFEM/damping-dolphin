@@ -585,11 +585,7 @@ void MainWindow::switchTheme() {
 }
 
 void MainWindow::changeLegend() const {
-    if(ui->changeLegend->checkState() == Qt::Checked)
-        ui->canvas->legend->setVisible(true);
-    else
-        ui->canvas->legend->setVisible(false);
-
+    ui->canvas->legend->setVisible(ui->changeLegend->checkState() == Qt::Checked);
     ui->canvas->replot();
 }
 
