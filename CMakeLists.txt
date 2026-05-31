@@ -71,7 +71,6 @@ set(RESOURCES
         res/res.qrc
 )
 
-
 if (NOT MKL_FOUND)
     link_libraries(openblas)
 endif ()
