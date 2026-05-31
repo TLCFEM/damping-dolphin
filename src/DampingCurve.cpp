@@ -152,7 +152,7 @@ double DampingCurve::maxDampingRatio() {
 }
 
 void DampingCurve::tidyUp() {
-    for(auto& I : damping_modes)
+    for(const auto& I : damping_modes)
         I->tidyUp();
 }
 
