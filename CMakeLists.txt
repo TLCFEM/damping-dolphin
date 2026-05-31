@@ -4,7 +4,7 @@ project(damping-dolphin)
 
 set(DD_USE_TBB OFF CACHE BOOL "Compile TBB")
 if (NOT QT_PATH)
-    set(QT_PATH "$ENV{HOME}/Qt/6.10.1/gcc_64/lib/cmake" CACHE STRING "Path to Qt")
+    set(QT_PATH "$ENV{HOME}/Qt/6.11.1/gcc_64/lib/cmake" CACHE STRING "Path to Qt")
 endif ()
 set(CMAKE_PREFIX_PATH "${QT_PATH}")
 set(CMAKE_AUTOMOC ON)
@@ -22,7 +22,16 @@ if (UNIX)
 endif ()
 
 if (UNIX)
-    link_directories(lib/linux)
+    set(MKL_LINK static)
+    set(MKL_THREADING gnu_thread)
+    find_package(MKL)
+    if (MKL_FOUND)
+        message(STATUS "Using MKL library: ${MKL_VERSION}")
+        link_libraries(MKL::MKL)
+    else ()
+        message(STATUS "Using bundled OpenBLAS")
+        link_directories(lib/linux)
+    endif ()
 elseif (MSVC)
     link_directories(lib/win-msvc)
 else ()
@@ -32,12 +41,7 @@ endif ()
 include_directories(include)
 include_directories(include/QCustomPlot)
 
-find_package(Qt6 REQUIRED COMPONENTS
-        Core
-        Gui
-        Widgets
-        PrintSupport
-)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets PrintSupport)
 
 set(SOURCES
         src/FitSetting.cpp
@@ -66,10 +70,15 @@ set(RESOURCES
         res/res.qrc
 )
 
-link_libraries(Qt6::Core Qt6::Gui Qt6::Widgets Qt6::PrintSupport openblas)
+
+if (NOT MKL_FOUND)
+    link_libraries(openblas)
+endif ()
 
 if (UNIX)
-    link_libraries(gfortran quadmath gomp pthread)
+    if (NOT MKL_FOUND)
+        link_libraries(gfortran quadmath gomp pthread)
+    endif ()
 
     if (DD_USE_TBB)
         add_compile_definitions(DD_TBB_ENABLED)
@@ -86,3 +95,5 @@ endif ()
 
 add_executable(${PROJECT_NAME} ${UIS} ${SOURCES} ${RESOURCES})
 add_executable(scratch src/Scratch.cpp)
+
+target_link_libraries(${PROJECT_NAME} Qt6::Core Qt6::Gui Qt6::Widgets Qt6::PrintSupport)
