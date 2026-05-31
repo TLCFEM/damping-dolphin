@@ -574,16 +574,6 @@ void MainWindow::processFittingResult(QStringList result) {
     statusBar()->showMessage("Finished!");
 }
 
-void MainWindow::switchTheme() {
-    if(ui->darkMode->checkState() == Qt::Checked) {
-        QFile file(":/utilities/stylesheet_francesco.qss");
-        [[maybe_unused]] const auto result = file.open(QFile::ReadOnly);
-        setStyleSheet(QString::fromLatin1(file.readAll()));
-    }
-    else
-        setStyleSheet("");
-}
-
 void MainWindow::changeLegend() const {
     ui->canvas->legend->setVisible(ui->changeLegend->checkState() == Qt::Checked);
     ui->canvas->replot();

@@ -52,6 +52,6 @@ void ObjectiveFunction::Gradient(const mat& x, mat& g) { EvaluateWithGradient(x,
 
 size_t ObjectiveFunction::NumConstraints() const { return 0; }
 
-double ObjectiveFunction::EvaluateConstraint(const size_t, const arma::mat&) { return 0.; }
+double ObjectiveFunction::EvaluateConstraint(const size_t, const mat&) { return 0.; }
 
-void ObjectiveFunction::GradientConstraint(const size_t, const arma::mat& x, arma::mat& g) { g.zeros(size(x)); }
+void ObjectiveFunction::GradientConstraint(const size_t, const mat& x, mat& g) { g.zeros(size(x)); }

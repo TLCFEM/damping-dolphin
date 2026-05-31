@@ -18,7 +18,7 @@
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
       <widget class="QWidget" name="widget" native="true">
        <property name="minimumSize">
@@ -107,7 +107,7 @@
                     <double>1.000000000000000</double>
                    </property>
                    <property name="stepType">
-                    <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+                    <enum>QAbstractSpinBox::StepType::AdaptiveDecimalStepType</enum>
                    </property>
                    <property name="value">
                     <double>1.000000000000000</double>
@@ -210,7 +210,7 @@
                     <string/>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -220,7 +220,7 @@
                     <string/>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -230,7 +230,7 @@
                     <string/>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -240,7 +240,7 @@
                     <string/>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -250,7 +250,7 @@
                     <string/>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -366,7 +366,7 @@
                   <font/>
                  </property>
                  <property name="selectionMode">
-                  <enum>QAbstractItemView::MultiSelection</enum>
+                  <enum>QAbstractItemView::SelectionMode::MultiSelection</enum>
                  </property>
                 </widget>
                </item>
@@ -404,7 +404,7 @@
             <item>
              <spacer name="verticalSpacer">
               <property name="orientation">
-               <enum>Qt::Vertical</enum>
+               <enum>Qt::Orientation::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -491,7 +491,7 @@
                   <bool>true</bool>
                  </property>
                  <property name="editTriggers">
-                  <set>QAbstractItemView::NoEditTriggers</set>
+                  <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
                  </property>
                  <property name="alternatingRowColors">
                   <bool>true</bool>
@@ -546,7 +546,7 @@
                     <string>Scheme</string>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -583,7 +583,7 @@
                     <string>Optimizer</string>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -619,7 +619,7 @@
                     <string>Type 0</string>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -629,7 +629,7 @@
                     <string>Type 1</string>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -639,7 +639,7 @@
                     <string>Type 2</string>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -649,7 +649,7 @@
                     <string>Type 3</string>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -659,7 +659,7 @@
                     <string>Type 4</string>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -792,7 +792,7 @@
             <item>
              <spacer name="verticalSpacer_2">
               <property name="orientation">
-               <enum>Qt::Vertical</enum>
+               <enum>Qt::Orientation::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -869,7 +869,7 @@
                     <number>100000</number>
                    </property>
                    <property name="stepType">
-                    <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+                    <enum>QAbstractSpinBox::StepType::AdaptiveDecimalStepType</enum>
                    </property>
                    <property name="value">
                     <number>1000</number>
@@ -888,7 +888,7 @@
                     <number>100000</number>
                    </property>
                    <property name="stepType">
-                    <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+                    <enum>QAbstractSpinBox::StepType::AdaptiveDecimalStepType</enum>
                    </property>
                    <property name="value">
                     <number>600</number>
@@ -938,25 +938,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QGroupBox" name="groupBox_3">
-              <property name="title">
-               <string>Misc.</string>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_13">
-               <item>
-                <widget class="QCheckBox" name="darkMode">
-                 <property name="text">
-                  <string>Turn the lights off</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
              <spacer name="verticalSpacer_3">
               <property name="orientation">
-               <enum>Qt::Vertical</enum>
+               <enum>Qt::Orientation::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -1079,7 +1063,7 @@
                 <string>Samples</string>
                </property>
                <property name="alignment">
-                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                </property>
               </widget>
              </item>
@@ -1104,10 +1088,10 @@
                 <number>200</number>
                </property>
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="tickPosition">
-                <enum>QSlider::TicksAbove</enum>
+                <enum>QSlider::TickPosition::TicksAbove</enum>
                </property>
                <property name="tickInterval">
                 <number>100</number>
@@ -1132,7 +1116,7 @@
                 <string>200</string>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
               </widget>
              </item>
@@ -1526,22 +1510,6 @@
     </hint>
     <hint type="destinationlabel">
      <x>499</x>
-     <y>349</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>darkMode</sender>
-   <signal>stateChanged(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>switchTheme()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>258</x>
-     <y>316</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>510</x>
      <y>349</y>
     </hint>
    </hints>

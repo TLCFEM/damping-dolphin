@@ -25,8 +25,6 @@ Set `QT_PATH` to the proper `lib/cmake` folder of the taget Qt installation if C
 
 ## Dependencies
 
-The dark theme is taken from [TeXstudio](https://github.com/texstudio-org/texstudio) project.
-
 1. [Qt](https://doc.qt.io/qt-5.12/index.html)
 2. [Armadillo](http://arma.sourceforge.net/docs.html)
 3. [ensmallen](https://ensmallen.org/)

@@ -96,7 +96,6 @@ private slots:
     void loadControlPoint();
     void updateOptimizerModeList() const;
     void processFittingResult(QStringList);
-    void switchTheme();
     void changeLegend() const;
     void showGuidelines();
     void showFitSetting();
