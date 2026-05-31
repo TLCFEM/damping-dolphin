@@ -23,7 +23,7 @@ endif ()
 
 if (UNIX)
     set(MKL_LINK static)
-    set(MKL_INTERFACE "lp64")
+    set(MKL_INTERFACE lp64)
     set(MKL_THREADING gnu_thread)
     find_package(MKL)
     if (MKL_FOUND)
