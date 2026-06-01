@@ -474,7 +474,7 @@ void MainWindow::performFitting() {
 }
 
 void MainWindow::performFittingTask(const mat& reference) {
-    using ET = float;
+    using ET = double;
 
     std::unique_ptr<ObjectiveFunction<ET>> f;
 
