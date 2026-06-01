@@ -20,7 +20,7 @@
 
 #include "ObjectiveFunction.h"
 
-class ThreeWiseMen : public ObjectiveFunction {
+class ThreeWiseMen : public ObjectiveFunction<double> {
     static constexpr unsigned num_para = 3;
 
 public:

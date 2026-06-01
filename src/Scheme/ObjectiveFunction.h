@@ -20,47 +20,62 @@
 
 #include "../damping-dolphin.h"
 
-class ObjectiveFunction {
+template<typename ET> class ObjectiveFunction {
 protected:
     const unsigned num_modes;
 
-    mat sampling, response;
+    Mat<ET> sampling, response;
 
-    double min_omega = 0., max_omega = 0., min_zeta = 0., max_zeta = 0.;
-    double range_omega = 0.;
+    ET min_omega{0}, max_omega{0}, min_zeta{0}, max_zeta{0};
+    ET range_omega{0};
 
     uvec base;
 
-    double weight = 0.;
+    ET weight{0};
 
     int max_order = 10;
 
 public:
-    [[nodiscard]] virtual vec s(const vec&) const;
-    [[nodiscard]] virtual vec ds(const vec&) const;
+    [[nodiscard]] virtual Col<ET> s(const Col<ET>& p) const { return p; }
+    [[nodiscard]] virtual Col<ET> ds(const Col<ET>& p) const { return ones(size(p)); }
 
-    explicit ObjectiveFunction(unsigned);
+    explicit ObjectiveFunction(const unsigned S)
+        : num_modes(S) {}
     virtual ~ObjectiveFunction() = default;
 
-    void initializeSampling(mat&&);
+    void initializeSampling(Mat<ET>&& T) {
+        sampling = std::move(T);
+        response.set_size(num_modes, sampling.n_cols);
+        min_omega = log10(min(sampling.row(0))) - .1;
+        max_omega = log10(max(sampling.row(0))) + .1;
+        min_zeta = min(sampling.row(1));
+        max_zeta = max(sampling.row(1));
+        range_omega = max_omega - min_omega;
 
-    void setWeight(double);
-    void setMaxOrder(int);
+        base = linspace<uvec>(0, num_modes - 1, num_modes);
+    }
+
+    void setWeight(const ET W) { weight = W; }
+    void setMaxOrder(const int M) { max_order = M; }
 
     [[nodiscard]] virtual unsigned getSize() const = 0;
-    [[nodiscard]] unsigned getNumberModes() const;
+    [[nodiscard]] unsigned getNumberModes() const { return num_modes; }
 
-    [[nodiscard]] virtual size_t NumConstraints() const;
+    [[nodiscard]] virtual size_t NumConstraints() const { return 0; }
 
-    virtual double Evaluate(const mat&);
-    virtual void Gradient(const mat&, mat&);
+    virtual ET Evaluate(const Mat<ET>& x) {
+        Mat<ET> g;
 
-    virtual double EvaluateConstraint(size_t, const mat&);
-    virtual void GradientConstraint(size_t, const mat&, mat&);
+        return EvaluateWithGradient(x, g);
+    }
+    virtual void Gradient(const Mat<ET>& x, Mat<ET>& g) { EvaluateWithGradient(x, g); }
 
-    virtual double EvaluateWithGradient(const mat&, mat&) = 0;
+    virtual ET EvaluateConstraint(const size_t, const Mat<ET>&) { return ET(0); }
+    virtual void GradientConstraint(const size_t, const Mat<ET>& x, Mat<ET>& g) { g.zeros(size(x)); }
 
-    [[nodiscard]] virtual QStringList getTypeList(const mat&) const = 0;
+    virtual ET EvaluateWithGradient(const Mat<ET>&, Mat<ET>&) = 0;
+
+    [[nodiscard]] virtual QStringList getTypeList(const Mat<ET>&) const = 0;
 };
 
 #endif // OBJECTIVEFUNCTION_H

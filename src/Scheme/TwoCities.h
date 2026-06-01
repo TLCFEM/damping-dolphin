@@ -20,7 +20,7 @@
 
 #include "ObjectiveFunction.h"
 
-class TwoCities : public ObjectiveFunction {
+class TwoCities : public ObjectiveFunction<double> {
     static constexpr unsigned num_para = 4;
 
     static mat decimal(const mat&);

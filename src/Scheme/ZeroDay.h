@@ -20,7 +20,7 @@
 
 #include "ObjectiveFunction.h"
 
-class ZeroDay : public ObjectiveFunction {
+class ZeroDay : public ObjectiveFunction<double> {
     static constexpr unsigned num_para = 2;
 
 public:

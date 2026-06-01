@@ -69,7 +69,7 @@ public:
     bool StepTaken(OptimizerType&, FunctionType&, const MatType&) { return *if_quit; }
 };
 
-template<typename T> mat run_optimizer(const OptimizerSetting& opt_setting, ObjectiveFunction* f, std::atomic<bool>* quit) {
+template<typename T> mat run_optimizer(const OptimizerSetting& opt_setting, ObjectiveFunction<double>* f, std::atomic<bool>* quit) {
     T optimizer;
     NumBasis(optimizer, 20);
     StepSize(optimizer, opt_setting.stepSize);
