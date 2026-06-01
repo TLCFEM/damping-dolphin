@@ -53,7 +53,6 @@ set(SOURCES
         src/DampingCurve.cpp
         src/DampingMode.cpp
         src/MainWindow.cpp
-        src/Scheme/ThreeWiseMen.cpp
 )
 
 set(UIS

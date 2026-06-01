@@ -483,7 +483,7 @@ void MainWindow::performFittingTask(const mat& reference) {
     else if(ui->optimizationScheme->currentText() == "Two Cities")
         f = std::make_unique<TwoCities<double>>(ui->numberT2->value());
     else if(ui->optimizationScheme->currentText() == "Three Wise Men")
-        f = std::make_unique<ThreeWiseMen>(ui->numberT3->value());
+        f = std::make_unique<ThreeWiseMen<double>>(ui->numberT3->value());
 
     const auto lower = log10(reference.col(0).min());
     const auto upper = log10(reference.col(0).max());
