@@ -161,7 +161,7 @@ public:
 
         const Col<ET> floor_diff = decimal(Mat<ET>{s(p)(i_shift)});
 
-        g = zeros(size(x));
+        g = zeros<Mat<ET>>(size(x));
         g(num_para * i_mode + i_shift) = ET(2) * this->weight * floor_diff(0) * ds(p)(i_shift);
     }
 

@@ -474,7 +474,7 @@ void MainWindow::performFitting() {
 }
 
 void MainWindow::performFittingTask(const mat& reference) {
-    using ET = double;
+    using ET = float;
 
     std::unique_ptr<ObjectiveFunction<ET>> f;
 
@@ -499,10 +499,12 @@ void MainWindow::performFittingTask(const mat& reference) {
     opt_setting.weight = fit_dialog.getUi()->weight->text().toDouble();
     opt_setting.maxIter = fit_dialog.getUi()->maxIter->text().toInt();
 
-    Mat<ET> result, samples;
+    Mat<ET> result;
+
+    mat samples;
 
     if(reference.n_rows == 1)
-        samples = conv_to<Mat<ET>>::from(reference);
+        samples = reference;
     else {
         samples.set_size(number_samples, 2);
         samples.col(0) = logspace(lower, upper, number_samples);
@@ -513,7 +515,7 @@ void MainWindow::performFittingTask(const mat& reference) {
             interp1(reference.col(0), reference.col(1), samples.col(0), samples_y);
     }
 
-    f->initializeSampling(samples.t());
+    f->initializeSampling(conv_to<Mat<ET>>::from(samples.t()));
 
     early_quit = false;
 

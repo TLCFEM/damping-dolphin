@@ -79,9 +79,9 @@ template<typename T, typename ET> Mat<ET> run_optimizer(const OptimizerSetting& 
     f->setWeight(opt_setting.weight);
     f->setMaxOrder(opt_setting.maxOrder);
 
-    Mat<ET> x = ET(2) * randn(f->getSize() * f->getNumberModes());
+    Mat<ET> x = ET(2) * randn<Mat<ET>>(f->getSize() * f->getNumberModes());
 
-    optimizer.Optimize(*f, x, Report(0.1), PrintLoss(), EarlyQuit<decltype(x)>(quit));
+    optimizer.Optimize(*f, x, PrintLoss(), EarlyQuit<decltype(x)>(quit));
 
     return reshape(x, f->getSize(), f->getNumberModes()).eval().each_col([&](Col<ET>& a) { a = f->s(a); }).t();
 }

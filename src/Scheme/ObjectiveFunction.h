@@ -37,7 +37,7 @@ protected:
 
 public:
     [[nodiscard]] virtual Col<ET> s(const Col<ET>& p) const { return p; }
-    [[nodiscard]] virtual Col<ET> ds(const Col<ET>& p) const { return ones(size(p)); }
+    [[nodiscard]] virtual Col<ET> ds(const Col<ET>& p) const { return ones<Col<ET>>(size(p)); }
 
     explicit ObjectiveFunction(const unsigned S)
         : num_modes(S) {}
