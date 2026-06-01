@@ -1,9 +1,7 @@
 name: Dev
 on:
   push:
-    branches: [ dev ]
   pull_request:
-    branches: [ dev ]
 env:
   DD_TIME: ""
 jobs:
@@ -39,6 +37,7 @@ jobs:
           name: damping-dolphin-linux.tar.gz
           path: damping-dolphin-linux.tar.gz
       - name: Release
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/master')
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
