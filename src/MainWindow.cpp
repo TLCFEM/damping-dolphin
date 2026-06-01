@@ -481,7 +481,7 @@ void MainWindow::performFittingTask(const mat& reference) {
     else if(ui->optimizationScheme->currentText() == "Unicorn")
         f = std::make_unique<Unicorn<double>>(ui->numberT1->value());
     else if(ui->optimizationScheme->currentText() == "Two Cities")
-        f = std::make_unique<TwoCities>(ui->numberT2->value());
+        f = std::make_unique<TwoCities<double>>(ui->numberT2->value());
     else if(ui->optimizationScheme->currentText() == "Three Wise Men")
         f = std::make_unique<ThreeWiseMen>(ui->numberT3->value());
 

@@ -45,12 +45,7 @@ SOURCES += \
     src/damping-dolphin.cpp \
     src/DampingCurve.cpp \
     src/DampingMode.cpp \
-    src/MainWindow.cpp \
-    src/Scheme/ObjectiveFunction.cpp \
-    src/Scheme/ThreeWiseMen.cpp \
-    src/Scheme/Unicorn.cpp \
-    src/Scheme/TwoCities.cpp \
-    src/Scheme/ZeroDay.cpp
+    src/MainWindow.cpp
 
 HEADERS += \
     src/FitSetting.h \

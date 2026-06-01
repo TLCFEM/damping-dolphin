@@ -54,7 +54,6 @@ set(SOURCES
         src/DampingMode.cpp
         src/MainWindow.cpp
         src/Scheme/ThreeWiseMen.cpp
-        src/Scheme/TwoCities.cpp
 )
 
 set(UIS
