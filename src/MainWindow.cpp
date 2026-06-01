@@ -474,16 +474,18 @@ void MainWindow::performFitting() {
 }
 
 void MainWindow::performFittingTask(const mat& reference) {
-    std::unique_ptr<ObjectiveFunction<double>> f;
+    using ET = double;
+
+    std::unique_ptr<ObjectiveFunction<ET>> f;
 
     if(ui->optimizationScheme->currentText() == "Zero Day")
-        f = std::make_unique<ZeroDay<double>>(ui->numberT0->value());
+        f = std::make_unique<ZeroDay<ET>>(ui->numberT0->value());
     else if(ui->optimizationScheme->currentText() == "Unicorn")
-        f = std::make_unique<Unicorn<double>>(ui->numberT1->value());
+        f = std::make_unique<Unicorn<ET>>(ui->numberT1->value());
     else if(ui->optimizationScheme->currentText() == "Two Cities")
-        f = std::make_unique<TwoCities<double>>(ui->numberT2->value());
+        f = std::make_unique<TwoCities<ET>>(ui->numberT2->value());
     else if(ui->optimizationScheme->currentText() == "Three Wise Men")
-        f = std::make_unique<ThreeWiseMen<double>>(ui->numberT3->value());
+        f = std::make_unique<ThreeWiseMen<ET>>(ui->numberT3->value());
 
     const auto lower = log10(reference.col(0).min());
     const auto upper = log10(reference.col(0).max());
@@ -497,14 +499,14 @@ void MainWindow::performFittingTask(const mat& reference) {
     opt_setting.weight = fit_dialog.getUi()->weight->text().toDouble();
     opt_setting.maxIter = fit_dialog.getUi()->maxIter->text().toInt();
 
-    mat result, samples;
+    Mat<ET> result, samples;
 
     if(reference.n_rows == 1)
-        samples = reference;
+        samples = conv_to<Mat<ET>>::from(reference);
     else {
         samples.set_size(number_samples, 2);
         samples.col(0) = logspace(lower, upper, number_samples);
-        vec samples_y(samples.colptr(1), number_samples, false, true);
+        Col samples_y(samples.colptr(1), number_samples, false, true);
         if(ui->switchCurveScale->checkState() == Qt::Checked)
             interp1(log10(reference.col(0)), reference.col(1), log10(samples.col(0)), samples_y);
         else

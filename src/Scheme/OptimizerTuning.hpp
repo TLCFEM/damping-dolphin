@@ -69,7 +69,7 @@ public:
     bool StepTaken(OptimizerType&, FunctionType&, const MatType&) { return *if_quit; }
 };
 
-template<typename T> mat run_optimizer(const OptimizerSetting& opt_setting, ObjectiveFunction<double>* f, std::atomic<bool>* quit) {
+template<typename T, typename ET> Mat<ET> run_optimizer(const OptimizerSetting& opt_setting, ObjectiveFunction<ET>* f, std::atomic<bool>* quit) {
     T optimizer;
     NumBasis(optimizer, 20);
     StepSize(optimizer, opt_setting.stepSize);
@@ -79,11 +79,11 @@ template<typename T> mat run_optimizer(const OptimizerSetting& opt_setting, Obje
     f->setWeight(opt_setting.weight);
     f->setMaxOrder(opt_setting.maxOrder);
 
-    mat x = 2. * randn(f->getSize() * f->getNumberModes());
+    Mat<ET> x = ET(2) * randn(f->getSize() * f->getNumberModes());
 
     optimizer.Optimize(*f, x, Report(0.1), PrintLoss(), EarlyQuit<decltype(x)>(quit));
 
-    return reshape(x, f->getSize(), f->getNumberModes()).eval().each_col([&](vec& a) { a = f->s(a); }).t();
+    return reshape(x, f->getSize(), f->getNumberModes()).eval().each_col([&](Col<ET>& a) { a = f->s(a); }).t();
 }
 
 #endif // OPTIMIZERTUNING_H
