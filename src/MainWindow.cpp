@@ -477,7 +477,7 @@ void MainWindow::performFittingTask(const mat& reference) {
     std::unique_ptr<ObjectiveFunction<double>> f;
 
     if(ui->optimizationScheme->currentText() == "Zero Day")
-        f = std::make_unique<ZeroDay>(ui->numberT0->value());
+        f = std::make_unique<ZeroDay<double>>(ui->numberT0->value());
     else if(ui->optimizationScheme->currentText() == "Unicorn")
         f = std::make_unique<Unicorn>(ui->numberT1->value());
     else if(ui->optimizationScheme->currentText() == "Two Cities")

@@ -56,7 +56,6 @@ set(SOURCES
         src/Scheme/ThreeWiseMen.cpp
         src/Scheme/Unicorn.cpp
         src/Scheme/TwoCities.cpp
-        src/Scheme/ZeroDay.cpp
 )
 
 set(UIS
