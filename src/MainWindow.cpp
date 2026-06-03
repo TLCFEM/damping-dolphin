@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     ui->omega->setMaximum(std::numeric_limits<double>::max());
 
-    ui->controlPointTable->setModel(table);
+    ui->controlPointTable->setModel(table.get());
     ui->controlPointTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     ui->canvas->setNoAntialiasingOnDrag(true);
@@ -54,11 +54,7 @@ MainWindow::MainWindow(QWidget* parent)
 }
 
 MainWindow::~MainWindow() {
-    if(optimization_task.valid())
-        optimization_task.get();
-
-    delete table;
-    delete ui;
+    if(optimization_task.valid()) optimization_task.get();
 }
 
 void MainWindow::savePlot() {
@@ -570,7 +566,7 @@ void MainWindow::updateOptimizerModeList() const {
         ui->numberT3->setEnabled(true);
 }
 
-void MainWindow::processFittingResult(QStringList result) {
+void MainWindow::processFittingResult(const QStringList& result) {
     addType(result);
 
     addControlPointToPlot();

@@ -35,13 +35,12 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget* = nullptr);
-    ~MainWindow();
+    explicit MainWindow(QWidget* = nullptr);
+    ~MainWindow() override;
 
 private:
-    Ui::MainWindow* ui;
-
-    QStandardItemModel* table;
+    std::unique_ptr<Ui::MainWindow> ui;
+    std::unique_ptr<QStandardItemModel> table;
 
     Guide guide_dialog;
 
@@ -72,7 +71,7 @@ private:
     void addType(const QStringList&);
     void addControlPointToPlot();
     void updateScale() const;
-    bool validateScheme() const;
+    [[nodiscard]] bool validateScheme() const;
 private slots:
     void addControlPoint();
     void addType();
@@ -95,7 +94,7 @@ private slots:
     void performFittingTask(const arma::mat&);
     void loadControlPoint();
     void updateOptimizerModeList() const;
-    void processFittingResult(QStringList);
+    void processFittingResult(const QStringList&);
     void changeLegend() const;
     void showGuidelines();
     void showFitSetting();
