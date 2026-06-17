@@ -1,3 +1,6 @@
 [submodule "oneTBB.git"]
 	path = oneTBB
 	url = https://github.com/oneapi-src/oneTBB.git
+[submodule "qlementine"]
+	path = qlementine
+	url = https://github.com/oclero/qlementine.git

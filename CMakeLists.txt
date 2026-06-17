@@ -21,6 +21,9 @@ if (UNIX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 endif ()
 
+add_subdirectory(qlementine)
+#add_compile_definitions(DD_QLEMENTINE_ENABLED)
+
 if (UNIX)
     set(MKL_LINK static)
     set(MKL_INTERFACE lp64)
@@ -90,4 +93,4 @@ endif ()
 add_executable(${PROJECT_NAME} ${UIS} ${SOURCES} ${RESOURCES})
 add_executable(scratch src/Scratch.cpp)
 
-target_link_libraries(${PROJECT_NAME} Qt6::Core Qt6::Gui Qt6::Widgets Qt6::PrintSupport)
+target_link_libraries(${PROJECT_NAME} qlementine Qt6::Core Qt6::Gui Qt6::Widgets Qt6::PrintSupport)

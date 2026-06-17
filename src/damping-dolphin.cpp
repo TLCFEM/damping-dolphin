@@ -17,10 +17,18 @@
 
 #include <QApplication>
 #include <QFile>
+#ifdef DD_QLEMENTINE_ENABLED
+#include <oclero/qlementine.hpp>
+#endif
 #include "MainWindow.h"
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
+
+#ifdef DD_QLEMENTINE_ENABLED
+    QApplication::setStyle(new oclero::qlementine::QlementineStyle(&app));
+#endif
+
     QApplication::setApplicationName("Damping Dolphin");
     QApplication::setApplicationDisplayName("Damping Dolphin");
     QApplication::setOrganizationName("University of Canterbury");
