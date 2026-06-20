@@ -200,6 +200,7 @@ op_strans::apply_mat_noalias(Mat<eT>& out, const TA& A)
       op_strans::apply_mat_noalias_large(out, A);
       }
     else
+    if(A_n_cols != 0)
       {
       eT* outptr = out.memptr();
       
@@ -388,7 +389,7 @@ op_strans::apply_direct(Mat<typename T1::elem_type>& out, const T1& X)
   // allow detection of in-place transpose
   if(is_Mat<T1>::value)
     {
-    const unwrap<T1> U(X);
+    const plain_unwrap<T1> U(X);
     
     op_strans::apply_mat(out, U.M);
     }

@@ -82,6 +82,8 @@ class Cube : public BaseCube< eT, Cube<eT> >
   
   public:
   
+  static constexpr bool has_subview = false;
+  
   inline ~Cube();
   inline  Cube();
   
@@ -359,6 +361,9 @@ class Cube : public BaseCube< eT, Cube<eT> >
   inline Cube& clamp(const eT min_val, const eT max_val);
   
   inline Cube& fill(const eT val);
+  
+  template<typename fill_type>
+  inline Cube& fill(const fill::fill_class<fill_type>& f);
   
   inline Cube& zeros();
   inline Cube& zeros(const uword new_n_rows, const uword new_n_cols, const uword new_n_slices);
