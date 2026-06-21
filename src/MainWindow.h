@@ -21,6 +21,7 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <future>
+#include <stop_token>
 #include "DampingCurve.h"
 #include "FitSetting.h"
 #include "Guide.h"
@@ -64,7 +65,7 @@ private:
                                       Qt::DashDotLine,
                                       Qt::DashDotDotLine};
 
-    std::atomic<bool> early_quit{false};
+    std::stop_source early_quit;
     std::future<void> optimization_task;
 
     void addType(const QString&);

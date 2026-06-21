@@ -18,6 +18,8 @@
 #ifndef OPTIMIZERTUNING_H
 #define OPTIMIZERTUNING_H
 
+#include <stop_token>
+#include <utility>
 #include "ObjectiveFunction.h"
 
 struct OptimizerSetting {
@@ -50,26 +52,26 @@ template<> inline void Tolerance(AugLagrangian&, double) {}
 
 template<typename MatType>
 class EarlyQuit {
-    std::atomic<bool>* if_quit;
+    std::stop_token if_quit;
 
 public:
-    explicit EarlyQuit(std::atomic<bool>* quit)
-        : if_quit(quit) {}
+    explicit EarlyQuit(std::stop_token token)
+        : if_quit(std::move(token)) {}
 
     template<typename OptimizerType, typename FunctionType>
-    bool BeginOptimization(OptimizerType&, FunctionType&, const MatType&) { return *if_quit; }
+    bool BeginOptimization(OptimizerType&, FunctionType&, const MatType&) { return if_quit.stop_requested(); }
 
     template<typename OptimizerType, typename FunctionType>
-    bool Evaluate(OptimizerType&, FunctionType&, const MatType&, double) { return *if_quit; }
+    bool Evaluate(OptimizerType&, FunctionType&, const MatType&, double) { return if_quit.stop_requested(); }
 
     template<typename OptimizerType, typename FunctionType, typename GradType>
-    bool Gradient(OptimizerType&, FunctionType&, const MatType&, const GradType&) { return *if_quit; }
+    bool Gradient(OptimizerType&, FunctionType&, const MatType&, const GradType&) { return if_quit.stop_requested(); }
 
     template<typename OptimizerType, typename FunctionType>
-    bool StepTaken(OptimizerType&, FunctionType&, const MatType&) { return *if_quit; }
+    bool StepTaken(OptimizerType&, FunctionType&, const MatType&) { return if_quit.stop_requested(); }
 };
 
-template<typename T, typename ET> Mat<ET> run_optimizer(const OptimizerSetting& opt_setting, ObjectiveFunction<ET>* f, std::atomic<bool>* quit) {
+template<typename T, typename ET> Mat<ET> run_optimizer(const OptimizerSetting& opt_setting, ObjectiveFunction<ET>* f, std::stop_token token) {
     T optimizer;
     NumBasis(optimizer, 20);
     StepSize(optimizer, opt_setting.stepSize);
@@ -81,7 +83,7 @@ template<typename T, typename ET> Mat<ET> run_optimizer(const OptimizerSetting& 
 
     Mat<ET> x = ET(2) * randn<Mat<ET>>(f->getSize() * f->getNumberModes());
 
-    optimizer.Optimize(*f, x, PrintLoss(), EarlyQuit<decltype(x)>(quit));
+    optimizer.Optimize(*f, x, PrintLoss(), EarlyQuit<decltype(x)>(token));
 
     return reshape(x, f->getSize(), f->getNumberModes()).eval().each_col([&](Col<ET>& a) { a = f->s(a); }).t();
 }

@@ -447,7 +447,7 @@ void MainWindow::performFitting() {
         if(optimization_task.wait_for(0ms) != std::future_status::ready) {
             statusBar()->showMessage("The previous optimization is still running.");
             if(const int ret = QMessageBox::question(this, tr("Task is running."), tr("The optimization task is running, click OK to wait, or Abort to cancel"), QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Abort)); QMessageBox::Abort == ret)
-                early_quit = true;
+                (void)early_quit.request_stop();
             return;
         }
     }
@@ -513,14 +513,14 @@ void MainWindow::performFittingTask(const mat& reference) {
 
     f->initializeSampling(conv_to<Mat<ET>>::from(samples.t()));
 
-    early_quit = false;
+    early_quit = std::stop_source();
 
     if(ui->optimizerList->currentText() == "LBFGS")
-        result = run_optimizer<L_BFGS>(opt_setting, f.get(), &early_quit);
+        result = run_optimizer<L_BFGS>(opt_setting, f.get(), early_quit.get_token());
     else if(ui->optimizerList->currentText() == "Gradient Descent")
-        result = run_optimizer<GradientDescent>(opt_setting, f.get(), &early_quit);
+        result = run_optimizer<GradientDescent>(opt_setting, f.get(), early_quit.get_token());
     else if(ui->optimizerList->currentText() == "AugLagrangian")
-        result = run_optimizer<AugLagrangian>(opt_setting, f.get(), &early_quit);
+        result = run_optimizer<AugLagrangian>(opt_setting, f.get(), early_quit.get_token());
 
     result.print("result");
 
