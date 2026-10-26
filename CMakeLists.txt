@@ -4,7 +4,7 @@ project(damping-dolphin)
 
 set(DD_USE_TBB OFF CACHE BOOL "Compile TBB")
 if (NOT QT_PATH)
-    set(QT_PATH "$ENV{HOME}/Qt/6.11.1/gcc_64/lib/cmake" CACHE STRING "Path to Qt")
+    set(QT_PATH "$ENV{HOME}/Qt/6.12.0/gcc_64/lib/cmake" CACHE STRING "Path to Qt")
 endif ()
 set(CMAKE_PREFIX_PATH "${QT_PATH}")
 set(CMAKE_AUTOMOC ON)
