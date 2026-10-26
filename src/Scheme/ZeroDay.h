@@ -58,8 +58,8 @@ public:
         return sp;
     }
     [[nodiscard]] Col<ET> ds(const Col<ET>& p) const override {
-        const auto expw = exp(-abs(p(0)));
-        const auto expz = exp(-abs(p(1)));
+        const auto expw = exp(-std::fabs(p(0)));
+        const auto expz = exp(-std::fabs(p(1)));
 
         Col<ET> dsp(num_para);
 

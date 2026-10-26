@@ -93,16 +93,16 @@ public:
     [[nodiscard]] Col<ET> ds(const Col<ET>& p) const override {
         Col<ET> dsp(num_para);
 
-        auto expp = exp(-abs(p(0)));
+        auto expp = exp(-std::fabs(p(0)));
         dsp(0) = log(ET(10)) * expp * pow(ET(1) + expp, -ET(2)) * pow(ET(10), this->min_omega + this->range_omega / (ET(1) + exp(-p(0)))) * this->range_omega;
 
-        expp = exp(-abs(p(1)));
+        expp = exp(-std::fabs(p(1)));
         dsp(1) = this->max_zeta * expp * pow(ET(1) + expp, -ET(2));
 
-        expp = exp(-abs(p(2)));
+        expp = exp(-std::fabs(p(2)));
         dsp(2) = this->max_order * expp * pow(ET(1) + expp, -ET(2));
 
-        expp = exp(-abs(p(3)));
+        expp = exp(-std::fabs(p(3)));
         dsp(3) = this->max_order * expp * pow(ET(1) + expp, -ET(2));
 
         return dsp;
