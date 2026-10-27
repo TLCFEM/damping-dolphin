@@ -18,13 +18,14 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "DampingCurve.h"
+#include "FitSetting.h"
+#include "Guide.h"
+
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <future>
 #include <stop_token>
-#include "DampingCurve.h"
-#include "FitSetting.h"
-#include "Guide.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -51,19 +52,9 @@ private:
 
     ControlPoint control_point;
 
-    QVector<QColor> color_preset{QColor(228, 26, 28),
-                                 QColor(55, 126, 184),
-                                 QColor(77, 175, 74),
-                                 QColor(152, 78, 163),
-                                 QColor(255, 127, 0),
-                                 QColor(255, 255, 51),
-                                 QColor(166, 86, 40)};
+    QVector<QColor> color_preset{QColor(228, 26, 28), QColor(55, 126, 184), QColor(77, 175, 74), QColor(152, 78, 163), QColor(255, 127, 0), QColor(255, 255, 51), QColor(166, 86, 40)};
 
-    QVector<Qt::PenStyle> line_preset{Qt::SolidLine,
-                                      Qt::DashLine,
-                                      Qt::DotLine,
-                                      Qt::DashDotLine,
-                                      Qt::DashDotDotLine};
+    QVector<Qt::PenStyle> line_preset{Qt::SolidLine, Qt::DashLine, Qt::DotLine, Qt::DashDotLine, Qt::DashDotDotLine};
 
     std::stop_source early_quit;
     std::future<void> optimization_task;

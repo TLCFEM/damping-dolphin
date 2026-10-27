@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "DampingCurve.h"
+
 #include "DampingMode.h"
 
 void DampingCurve::initializeVector(const size_t samples) {

@@ -5,7 +5,9 @@
 
 class LinearRegressionFunction {
 public:
-    LinearRegressionFunction(arma::mat& X, arma::vec& y) : X(X), y(y) {}
+    LinearRegressionFunction(arma::mat& X, arma::vec& y)
+        : X(X)
+        , y(y) {}
 
     double EvaluateWithGradient(const arma::mat& theta, arma::mat& gradient) {
         const arma::vec tmp = X.t() * theta - y;

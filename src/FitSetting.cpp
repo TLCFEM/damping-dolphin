@@ -16,13 +16,16 @@
  ******************************************************************************/
 
 #include "FitSetting.h"
+
+#include "ui_FitSetting.h"
+
 #include <QIcon>
 #include <QInputDialog>
 #include <QMessageBox>
-#include "ui_FitSetting.h"
 
 FitSetting::FitSetting(QWidget* parent)
-    : QDialog(parent), ui(new Ui::FitSetting) {
+    : QDialog(parent)
+    , ui(new Ui::FitSetting) {
     ui->setupUi(this);
 
     setWindowTitle("Advanced Settings");

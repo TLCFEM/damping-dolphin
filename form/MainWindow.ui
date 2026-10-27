@@ -599,11 +599,6 @@
                    </item>
                    <item>
                     <property name="text">
-                     <string>Gradient Descent</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
                      <string>AugLagrangian</string>
                     </property>
                    </item>

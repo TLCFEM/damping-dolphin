@@ -18,7 +18,10 @@
 #include "DampingMode.h"
 
 DampingMode::DampingMode(const double in_omega, const double in_zeta, std::vector<double>&& in_p, const MT in_type)
-    : type(in_type), omega_p(in_omega), zeta_p(in_zeta), p(std::forward<std::vector<double>>(in_p)) {}
+    : type(in_type)
+    , omega_p(in_omega)
+    , zeta_p(in_zeta)
+    , p(std::forward<std::vector<double>>(in_p)) {}
 
 void DampingMode::tidyUp() {}
 

@@ -16,11 +16,14 @@
  ******************************************************************************/
 
 #include "Guide.h"
-#include <QIcon>
+
 #include "ui_Guide.h"
 
+#include <QIcon>
+
 Guide::Guide(QWidget* parent)
-    : QDialog(parent), ui(new Ui::Guide) {
+    : QDialog(parent)
+    , ui(new Ui::Guide) {
     ui->setupUi(this);
 
     setWindowTitle("Guide");

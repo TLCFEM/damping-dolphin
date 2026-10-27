@@ -17,15 +17,20 @@
 
 #include "MainWindow.h"
 
-#include <ranges>
 #include "About.h"
 #include "DampingMode.h"
 #include "Scheme/Scheme"
 #include "ui_FitSetting.h"
 #include "ui_MainWindow.h"
 
+#include <ranges>
+
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), table(new QStandardItemModel(0, 2, this)), guide_dialog(this), fit_dialog(this) {
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+    , table(new QStandardItemModel(0, 2, this))
+    , guide_dialog(this)
+    , fit_dialog(this) {
     ui->setupUi(this);
 
     table->setHorizontalHeaderLabels(QStringList({QString{"Frequency"}, QString{"Damping Ratio"}}));
@@ -517,8 +522,6 @@ void MainWindow::performFittingTask(const mat& reference) {
 
     if(ui->optimizerList->currentText() == "LBFGS")
         result = run_optimizer<L_BFGS>(opt_setting, f.get(), early_quit.get_token());
-    else if(ui->optimizerList->currentText() == "Gradient Descent")
-        result = run_optimizer<GradientDescent>(opt_setting, f.get(), early_quit.get_token());
     else if(ui->optimizerList->currentText() == "AugLagrangian")
         result = run_optimizer<AugLagrangian>(opt_setting, f.get(), early_quit.get_token());
 

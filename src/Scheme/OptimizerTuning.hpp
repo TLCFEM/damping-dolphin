@@ -18,9 +18,10 @@
 #ifndef OPTIMIZERTUNING_H
 #define OPTIMIZERTUNING_H
 
+#include "ObjectiveFunction.h"
+
 #include <stop_token>
 #include <utility>
-#include "ObjectiveFunction.h"
 
 struct OptimizerSetting {
     int maxOrder = 5;
